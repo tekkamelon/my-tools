@@ -1,0 +1,6 @@
+#!/bin/sh
+
+# 1つ目の引数を変数inputfileに定義
+input_file=$1
+
+sudo busybox httpd -f -h $input_file 

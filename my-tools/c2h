@@ -1,0 +1,27 @@
+#!/bin/awk -f
+
+# ファイルの頭に追記
+BEGIN{
+	# 区切り文字の指定
+	FS ="," 
+	# 区切り文字をタグに置換
+	OFS = "</td><td>"
+	# ヘッダの出力
+	print "<DOCTYPE html>"
+	print "<html>"
+	print "<table border=\"1\">"
+}
+
+{
+	# OFSを$0に反映させるためのフィールド操作
+	$1=$1;
+	# タグの追記
+	print "<tr>""\n""<td>"$0"</td>""\n""</tr>";
+}
+
+# ファイルの末尾に追記
+END{
+	print "</table>"
+	print "</html>"
+}
+
