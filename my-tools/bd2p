@@ -1,3 +1,5 @@
-#!/bin/bash -eux
+#!/bin/sh -eux
 
-barcode -b $(cat $1 | awk -F, '{print $1}' | perl -pe 's/\n/ -b /g' | perl -pe "s/ \-b \$/\n/") -t 3x6+20+60 -o $2 && convert $2 $3
+barcode -b $(cat $1 | awk -F, '{print $1}' | 
+	sed -e 's/\n/ -b /g' -e "s/ \-b \$/\n/"
+	) -t 3x6+20+60 -o $2 && convert $2 $3
