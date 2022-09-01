@@ -1,0 +1,33 @@
+#!/bin/awk -f
+
+# キーボードからの入力を受け取る
+BEGIN{
+	FS = ","
+	# プロンプト
+	printf "search word: "
+	# キーボードからの入力を読み込み
+	getline search < "/dev/stdin"
+}
+
+# 検索結果の表示
+$0 ~ search {
+	count = count + 1
+	print ""
+	print "ISBN: " $1
+	print "タイトル: " $2
+	print "出版社: " $3
+	print "発売日: " $4
+	print "著者: " $5
+}
+
+# 検索後のメッセージ
+END{
+	print ""
+	if(0 == count) {
+		# 一致するものがない場合
+		print search " is not found"
+	}else{
+		# 一致したものの件数
+		print count " match"
+	}
+}
