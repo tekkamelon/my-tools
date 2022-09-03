@@ -3,4 +3,18 @@
 # 1つ目の引数を変数inputfileに定義
 input_file=$1
 
-sudo busybox httpd -f -h $input_file 
+# 引数の有無を確認
+if [ "$1" = "" ]
+
+# 引数がない場合
+then
+	# エラーメッセージを表示
+	echo "please enter the arguments" 1>&2
+
+# 引数がある場合
+else
+	# httpdを実行
+	sudo busybox httpd -f -h $input_file 
+	# busybox httpd -p 8080 -h $input_file 
+fi
+
