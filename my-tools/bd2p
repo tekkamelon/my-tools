@@ -1,5 +1,5 @@
 #!/bin/sh -eux
 
-barcode -b $(cat $1 | awk -F, '{print $1}' | 
+barcode -b $(cat $1 | cut -d"," -f1 | 
 	sed -e 's/\n/ -b /g' -e "s/ \-b \$/\n/"
 	) -t 3x6+20+60 -o $2 && convert $2 $3
