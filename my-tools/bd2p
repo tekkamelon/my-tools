@@ -1,5 +1,14 @@
 #!/bin/sh -eux
 
-barcode -b $(cat $1 | cut -d"," -f1 | 
-	sed -e 's/\n/ -b /g' -e "s/ \-b \$/\n/"
+barcode -b $(cat $1 | 
+
+	# awkで区切り文字をカンマに指定
+	awk -F"," '{
+
+		# 改行を" -b "に置換,1フィールド目を出力
+		ORS = " -b "; print $1
+	}' | 
+	
+	# sedで末尾の" -b "を改行に置換
+	sed "s/ \-b \$/\n/"
 	) -t 3x6+20+60 -o $2 && convert $2 $3
