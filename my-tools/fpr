@@ -1,0 +1,12 @@
+#!/bin/sh
+
+# 置換前
+pattern="$1"
+
+# 置換後
+replace="$2"
+
+# 置換対象のファイル
+input_file="$3"
+
+printf "%%s/$pattern/$replace/g\nw\n" | ed - $input_file
