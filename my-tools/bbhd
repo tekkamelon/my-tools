@@ -3,16 +3,12 @@
 # 1つ目の引数を変数inputfileに定義
 host_dir=$1
 
-# 引数の有無を確認,なければ真,あれば偽
-if [ "$1" = "" ] then ;
+# 引数の有無を確認,あれば真,なければ偽
+echo "$1" | grep . &&
 
-	# 真の場合はエラーメッセージを表示
-	echo "please enter the arguments" 1>&2
+# 偽の場合はhttpdを実行
+sudo busybox httpd -f -h $host_dir ||
 
-else
-
-	# 偽の場合はhttpdを実行
-	sudo busybox httpd -f -h $host_dir 
-
-fi
+# 真の場合はエラーメッセージを表示
+echo "please enter the arguments" 1>&2
 
