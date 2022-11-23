@@ -1,3 +1,21 @@
 #!/bin/sh
 
-tee -a /tmp/tbug.log
+# パイプからの入力を変数に代入
+input=$(cat - )
+
+# "/tmp/tbug.log"の有無を確認,あれば真,なければ偽
+if [ test -n /tmp/tbug.log ] ; then
+
+	# 真の場合は何もしない
+	:
+
+else
+
+	# 偽の場合はファイルを作成
+	echo "" > /tmp/tbug.log
+
+fi
+
+# パイプの内容をteeに渡す
+echo "${input}" | tee -a /tmp/tbug.log
+
