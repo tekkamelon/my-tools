@@ -4,7 +4,7 @@
 input=$(cat - )
 
 # "/tmp/tbug.log"の有無を確認,あれば真,なければ偽
-if [ test -n /tmp/tbug.log ] ; then
+if [ -n /tmp/tbug.log ] ; then
 
 	# 真の場合は何もしない
 	:
