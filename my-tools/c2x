@@ -2,26 +2,40 @@
 
 # ファイルの頭に追記
 BEGIN {
+
 	# 区切り文字の指定
 	FS=","
+
 	# 区切り文字を改行に変換
 	OFS = "\n"
+	
+	# ヘッダの出力
 	print "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>"
 	print ""
+
 }
 
 # ヘッダの処理
 NR == 1{
+
 	# 各フィールドを変数に代入
 	for (i = 1; i <=NF; i++)
+
             xml_tag[i]=$i
+
+
 }
 
 # 2行目以降の処理
 NR != 1{
+
    # 各フィールドを変数に代入
    for (i = 1; i <= NF; i++)
-      print "<" xml_tag[i] ">" $i "</" xml_tag[i] ">"
+
+		# 変数に代入した値を出力
+		print "<" xml_tag[i] ">" $i "</" xml_tag[i] ">"
+
    print ""
+
 }
 

@@ -2,32 +2,47 @@
 
 # キーボードからの入力を受け取る
 BEGIN{
+
+	# 区切り文字の指定
 	FS = ","
+
 	# プロンプト
 	printf "search word: "
+
 	# キーボードからの入力を読み込み
 	getline search < "/dev/stdin"
+
 }
 
 # 検索結果の表示
 $0 ~ search {
+
 	count = count + 1
+
 	print ""
 	print "ISBN: " $1
 	print "タイトル: " $2
 	print "出版社: " $3
 	print "発売日: " $4
 	print "著者: " $5
+
 }
 
 # 検索後のメッセージ
 END{
 	print ""
+
+	# 検索にマッチしない場合は真,すれば偽
 	if(0 == count) {
-		# 一致するものがない場合
+
+		# 真の場合はメッセージを表示
 		print search " is not found"
+
 	}else{
-		# 一致したものの件数
+
+		# 偽の場合は一致したものの件数を表示
 		print count " match"
+
 	}
+
 }
