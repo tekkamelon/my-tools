@@ -12,7 +12,7 @@ if [ -n /tmp/tbug.log ] ; then
 else
 
 	# 偽の場合はファイルを作成
-	echo "" > /tmp/tbug.log
+	echo "" >| /tmp/tbug.log
 
 fi
 
