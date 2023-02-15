@@ -1,21 +1,22 @@
 #!/bin/sh
 
-# パイプからの入力を変数に代入
+# パイプからの入力,第一引数を変数に代入
 input=$(cat - )
+args1="${1}"
 
-# "/tmp/tbug.log"の有無を確認,あれば真,なければ偽
-if [ -n /tmp/tbug.log ] ; then
+# "/tmp/tbug.log"の有無を確認,無ければファイルを作成
+test -n /tmp/tbug.log || echo "" >| /tmp/tbug.log
 
-	# 真の場合は何もしない
-	:
+# 引数が"-q"ならば真,それ以外は偽
+if echo "${args1}" | grep -q -w "\-q" ; then
+
+	# 真の場合はファイルに追記
+	echo "${input}" >> /tmp/tbug.log
 
 else
 
-	# 偽の場合はファイルを作成
-	echo "" >| /tmp/tbug.log
+	# 偽の場合はteeでファイルに追記し出力
+	echo "${input}" | tee -a /tmp/tbug.log
 
 fi
-
-# パイプの内容をteeに渡す
-echo "${input}" | tee -a /tmp/tbug.log
 
