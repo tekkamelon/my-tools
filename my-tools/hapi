@@ -1,0 +1,33 @@
+#!/bin/sh -eu
+
+# 環境変数の設定
+export LANG=C
+
+# 標準入力を変数に代入
+pipe=$(cat - )
+
+# wgetがシステム内に存在するかを確認
+if type wget > /dev/null 2>&1 ; then
+
+	# wgetでapiを叩く
+	wget -q -O - "${pipe}"
+
+# curlがシステム内に存在するかを確認
+elif type curl > /dev/null 2>&1 ; then
+	
+	# curlでapiを叩く
+	curl -s "${pipe}"
+
+# w3mがシステム内に存在するかを確認
+elif type w3m > /dev/null 2>&1 ; then
+
+	# w3mでapiを叩く
+	w3m -dump "${pipe}"
+
+else
+
+	# wgetもcurlもない場合はエラーメッセージを表示
+	echo "please install wget or curl!" 1>&2
+
+fi
+
