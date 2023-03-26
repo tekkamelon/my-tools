@@ -1,21 +1,26 @@
-#!/bin/sh
+#!/bin/sh -u
 
 # TMUXの起動を確認,あれば真,なければ偽
 if [ -n "${TMUX}" ] ; then
 
 	# 真の場合はメッセージを標準エラー出力に表示
 	echo "tmux is started!" 1>&2
+	
+	# 空白行の挿入
+	echo "" 1>&2
+
+	# 既存のセッションの一覧を表示
+	tmux ls
 
 else
 
 	# 偽の場合は既存のセッションにアタッチ
 	tmux a ;
 
-	# セッションにアタッチできなかった場合は新規セッションを作成
 	# メッセージを標準エラー出力に表示
 	echo "make session" 1>&2
 
-	# それぞれセッションを作成し即デタッチ
+	# セッションにアタッチできなかった場合は新規セッションを作成,即デタッチ
 	tmux new-session -d -s edit
 	tmux new-session -d -s git
 	tmux new-session -d -s httpd
