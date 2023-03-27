@@ -1,4 +1,4 @@
-#!/bin/sh -u
+#!/bin/sh
 
 # TMUXの起動を確認,あれば真,なければ偽
 if [ -n "${TMUX}" ] ; then
@@ -15,7 +15,7 @@ if [ -n "${TMUX}" ] ; then
 else
 
 	# 偽の場合は既存のセッションにアタッチ
-	tmux a ;
+	tmux a ||
 
 	# メッセージを標準エラー出力に表示
 	echo "make session" 1>&2
