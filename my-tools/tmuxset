@@ -22,13 +22,22 @@ else
 
 	# セッションにアタッチできなかった場合は新規セッションを作成,即デタッチ
 	tmux new-session -d -s edit
-	tmux new-session -d -s git
+	tmux new-session -d -s git 
 	tmux new-session -d -s httpd
-	tmux new-session -d -s mpd
-	tmux new-session -d -s ssh
-	tmux new-session -d -s command
-	tmux new-session -d
-	tmux new-session -d
+	tmux new-session -d -s mpd 
+	tmux new-session -d -s ssh 
+	tmux new-session -d -s command 
+	tmux new-session -d ;
+
+	# 作成したセッションのペインを分割
+	{ 
+
+	tmux split-window -v -t git &
+	tmux split-window -v -t httpd &
+	tmux split-window -v -t mpd &
+	tmux split-window -v -t ssh ;
+
+	}
 
 	# 最初に作成したセッションにアタッチ
 	tmux a -t edit
