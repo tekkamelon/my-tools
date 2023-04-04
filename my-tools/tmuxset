@@ -1,5 +1,8 @@
 #!/bin/sh
 
+# 環境変数の設定
+export LANG=C
+
 # TMUXの起動を確認,あれば真,なければ偽
 if [ -n "${TMUX}" ] ; then
 
@@ -13,6 +16,9 @@ if [ -n "${TMUX}" ] ; then
 	tmux ls
 
 else
+
+	# ホームディレクトリに戻る
+	cd 
 
 	# 偽の場合は既存のセッションにアタッチ
 	tmux a ||
@@ -29,13 +35,14 @@ else
 	tmux new-session -d -s command 
 	tmux new-session -d ;
 
-	# 作成したセッションのペインを分割
+	# グループ化し並列に処理
 	{ 
 
-	tmux split-window -v -t git &
-	tmux split-window -v -t httpd &
-	tmux split-window -v -t mpd &
-	tmux split-window -v -t ssh ;
+		# 作成したセッションのペインを分割
+		tmux split-window -v -t git &
+		tmux split-window -v -t httpd &
+		tmux split-window -v -t mpd &
+		tmux split-window -v -t ssh ;
 
 	}
 
@@ -43,4 +50,3 @@ else
 	tmux a -t edit
 
 fi
-
