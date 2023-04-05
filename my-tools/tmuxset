@@ -1,8 +1,5 @@
 #!/bin/sh
 
-# 環境変数の設定
-export LANG=C
-
 # TMUXの起動を確認,あれば真,なければ偽
 if [ -n "${TMUX}" ] ; then
 
