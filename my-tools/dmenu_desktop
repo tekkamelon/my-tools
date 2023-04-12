@@ -1,0 +1,1 @@
+i3-dmenu-desktop --dmenu="dmenu -p "dmenu_desktop" -i -l 20 -sb "black" -sf "grey" -fn "VL Gothic-11""
