@@ -1,1 +1,41 @@
-i3-dmenu-desktop --dmenu="dmenu -p "dmenu_desktop" -i -l 20 -sb "black" -sf "grey" -fn "VL Gothic-11""
+#!/bin/sh
+
+# 環境変数の設定
+export LANG=C
+
+# 引数をargsに代入
+args="${@}"
+
+# argsの有無を判定,引数があれば真,なければ偽
+if [ -n "${args}" ] ; then
+
+	# 真の場合は引数をdmenuに渡す
+	dmenu_custom="${args}"
+
+else
+
+	# 偽の場合は予め設定された引数をdmenuに渡す
+	dmenu_custom=' -p "dmenu_desktop" -i -l 20 -sb "black" -sf "grey" -fn "monospace"'
+
+fi
+
+# 以降,変数が空の場合に実行を中止
+set -eu
+
+# j4-dmenu-desktopがシステム内に存在するかを確認
+if type j4-dmenu-desktop > /dev/null 2>&1 ; then
+
+	# j4-dmenu-desktopで起動
+	j4-dmenu-desktop --dmenu="dmenu ${dmenu_custom}"
+
+# i3-dmenu-desktopがシステム内に存在するかを確認
+elif type i3-dmenu-desktop > /dev/null 2>&1 ; then
+	
+	# i3-dmenu-desktopで起動
+	i3-dmenu-desktop --dmenu="dmenu ${dmenu_custom}"
+
+# エラー出力を捨てる
+fi 2> /dev/null
+
+exit 0
+
