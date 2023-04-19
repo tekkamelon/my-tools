@@ -1,0 +1,6 @@
+#!/bin/sh -eu
+
+# QTの環境変数を設定
+export LD_LIBRARY_PATH=$HOME/.local/share/CHITUBOX_v1-9-0/chitubox/lib/
+
+$HOME/.local/share/CHITUBOX_v1-9-0/chitubox/AppRun 
