@@ -1,6 +1,6 @@
-#!/bin/sh -eux
+#!/bin/sh -eu
 
-barcode -b $(cat $1 | 
+barcode -b "$(cat "${1}" | 
 
 	# awkで区切り文字をカンマに指定
 	awk -F"," '{
@@ -16,4 +16,4 @@ barcode -b $(cat $1 |
 	# sedで末尾の" -b "を改行に置換
 	sed "s/ \-b \$/\n/"
 
-	) -t 3x6+20+60 -o $2 && convert $2 $3
+	)" -t 3x6+20+60 -o "${2}" && convert "${2}" "${3}"

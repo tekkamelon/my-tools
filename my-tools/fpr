@@ -9,4 +9,4 @@ replace="$2"
 # 置換対象のファイル
 input_file="$3"
 
-printf "%%s/$pattern/$replace/g\nw\n" | ed - $input_file
+printf "%%s/$pattern/$replace/g\nw\n" | ed - "${input_file}"
