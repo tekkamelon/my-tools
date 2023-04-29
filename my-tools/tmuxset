@@ -15,7 +15,7 @@ if [ -n "${TMUX}" ] ; then
 else
 
 	# ホームディレクトリに戻る
-	cd 
+	cd || exit
 
 	# 偽の場合は既存のセッションにアタッチ
 	tmux a ||
