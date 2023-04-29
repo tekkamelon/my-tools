@@ -4,7 +4,7 @@
 export LANG=C
 
 # 引数をargsに代入
-args="${@}"
+args="${*}"
 
 # argsの有無を判定,引数があれば真,なければ偽
 if [ -n "${args}" ] ; then
