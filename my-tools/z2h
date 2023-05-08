@@ -1,7 +1,5 @@
 #!/bin/sh -eu
 
-# GNU sed必須
-
 # 標準入力の有無を確認,あれば真,無ければ偽
 if [ -p /dev/stdin ] ; then
 
@@ -10,16 +8,16 @@ if [ -p /dev/stdin ] ; then
 
     echo "${input_string}" |
         
-    # 全角英数を半角に置換
-    sed -e 'y/ＡＢＣＤＥＦＧＨＩＪＫＬＭＮＯＰＱＲＳＴＵＶＷＸＹＺａｂｃｄｅｆｇｈｉｊｋｌｍｎｏｐｑｒｓｔｕｖｗｘｙｚ０１２３４５６７８９/ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789/' -e 'y/　/ /'
+    # 全角英数,スペースを半角に置換
+	perl -C -Mutf8 -pe 'tr/０-９ａ-ｚＡ-Ｚ　/0-9a-zA-Z /'
 
 else
     
 	# 偽の場合は第1引数を変数に代入
 	args="${1}"
 
-    # 全角英数を半角に置換
-    sed -i -e 'y/ＡＢＣＤＥＦＧＨＩＪＫＬＭＮＯＰＱＲＳＴＵＶＷＸＹＺａｂｃｄｅｆｇｈｉｊｋｌｍｎｏｐｑｒｓｔｕｖｗｘｙｚ０１２３４５６７８９/ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789/' -e 'y/　/ /' "${args}"
-
+    # 全角英数,スペースを半角に置換し上書き保存
+	perl -C -Mutf8 -pe 'tr/０-９ａ-ｚＡ-Ｚ　/0-9a-zA-Z /' -i "${args}"
+	
 fi
 
