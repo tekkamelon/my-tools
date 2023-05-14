@@ -1,0 +1,43 @@
+#!/bin/sh
+
+# 環境変数の設定
+export LANG=C
+
+# 引数をargsに代入
+args="${*}"
+
+# argsの有無を判定,引数があれば真,なければ偽
+if [ -n "${args}" ] ; then
+
+	# 真の場合は引数をdmenuに渡す
+	dmenu_custom="dmenu ${args}"
+
+else
+
+	# 偽の場合は予め設定された引数をdmenuに渡す
+	dmenu_custom='dmenu -p dmenu_wmctrl -i -l 20 -sb black -sf grey -fn monospace'
+
+fi
+
+# 以降,変数が空の場合に実行を中止
+set -eu
+
+# wmctrlがシステム内に存在するかを確認,あれば真,なければ偽
+if type wmctrl > /dev/null 2>&1 ; then
+
+	# ウィンドウ一覧を"wmctrl"で出力,選択されたウィンドウを代入
+	selected_window=$(wmctrl -l | cut -d" " -f5- | ${dmenu_custom})
+
+	# 選択されたウィンドウに切り替え
+	wmctrl -a "${selected_window}"
+
+else
+
+	# 偽の場合はエラーメッセージを表示
+	echo "please install wmctrl!" | dmenu "${dmenu_custom}"
+
+# エラー出力を捨てる
+fi 2> /dev/null
+
+exit 0
+
