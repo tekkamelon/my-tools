@@ -25,7 +25,7 @@ set -eu
 # wmctrlがシステム内に存在するかを確認,あれば真,なければ偽
 if type wmctrl > /dev/null 2>&1 ; then
 
-	# ウィンドウ一覧を"wmctrl"で出力,選択されたウィンドウを代入
+	# ウィンドウ一覧を"wmctrl"で出力,選択されたウィンドウを変数に代入
 	selected_window=$(wmctrl -l | cut -d" " -f5- | ${dmenu_custom})
 
 	# 選択されたウィンドウに切り替え
@@ -33,11 +33,8 @@ if type wmctrl > /dev/null 2>&1 ; then
 
 else
 
-	# 偽の場合はエラーメッセージを表示
-	echo "please install wmctrl!" | dmenu "${dmenu_custom}"
+	# 偽の場合はエラーメッセージを表示,dmneuからの出力を捨てる
+	echo "please install \"wmctrl\"!" | dmenu -p "error!" > /dev/null
 
-# エラー出力を捨てる
-fi 2> /dev/null
-
-exit 0
+fi 
 
