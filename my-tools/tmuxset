@@ -1,29 +1,24 @@
 #!/bin/sh
 
-# TMUXの起動を確認,あれば真,なければ偽
-if [ -n "${TMUX}" ] ; then
+# セッション一覧を変数に代入
+tmux_check=$(tmux ls)
 
-	# 真の場合はメッセージを標準エラー出力に表示
-	echo "tmux is started!" 1>&2
-	
-	# 空白行の挿入
-	echo "" 1>&2
+# tmuxの起動を確認,あれば真,なければ偽
+if [ -n "${tmux_check}" ] ; then
 
-	# 既存のセッションの一覧を表示
-	tmux ls
+	# 真の場合は"git"セッションにアタッチ,なければ最後のセッションにアタッチ
+	tmux a -t git || tmux a
 
 else
 
+	# 偽の場合の処理
 	# ホームディレクトリに戻る
 	cd || exit
-
-	# 偽の場合は既存のセッションにアタッチ
-	tmux a ||
 
 	# メッセージを標準エラー出力に表示
 	echo "make session" 1>&2
 
-	# セッションにアタッチできなかった場合は新規セッションを作成,即デタッチ
+	# 新規セッションを作成,即デタッチ
 	tmux new-session -d -s edit
 	tmux new-session -d -s git 
 	tmux new-session -d -s httpd
@@ -43,7 +38,7 @@ else
 
 	}
 
-	# 最初に作成したセッションにアタッチ
+	# "edit"セッションにアタッチ
 	tmux a -t edit
 
 fi
