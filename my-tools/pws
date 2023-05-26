@@ -1,20 +1,28 @@
 #!/bin/sh -eu
 
+# 変数を宣言
+port="8080"
+args="${*}"
+
 # 標準入力の有無を確認,あれば真,無ければ偽
 if [ -p /dev/stdin ] ; then
 
 	# 真の場合は標準入力に改行を付与し変数に代入
-	input=$(cat - | awk '{print $0"<br>"}')
+	input=$(cat - )
 
-else 
+elif [ -n "${args}" ] ; then
 	
+	input="${args}"
+
+else
+
 	# 偽の場合はエラーメッセージを変数に代入
 	input="no stdin!"
 
 fi
 
 # ヒアドキュメントでヘッダと変数の内容を出力,ncに渡す
-cat << EOS | nc -l 8080
+cat << EOS | nc -l "${port}"
 HTTP/1.1 200 OK
 
 <head>
