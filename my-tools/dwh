@@ -12,7 +12,8 @@ if [ "${#}" = 4 ] ; then
 	# 以降,変数が空の場合に中止
 	set -ue
 
-	ping "${local_ip}" -c 3 &&
+	# 引数で受け取ったURLにパケットを送信,応答がなければwebhookのURLにPOST
+	ping "${local_ip}" -c 3 ||
 
 # curlでdiscordのwebhookにメッセージをPOST
 	curl -X POST  "${webhook_url}" -H "Content-Type: application/json" -d @- <<EOS
