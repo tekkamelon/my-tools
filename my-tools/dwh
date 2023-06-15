@@ -1,0 +1,32 @@
+#!/bin/sh
+
+# 引数が4つある場合は真,なければ偽
+if [ "${#}" = 4 ] ; then
+
+	# 変数の宣言
+	local_ip="${1}"
+	webhook_url="${2}"
+	bot_name="${3}"
+	message="${4}"
+
+	# 以降,変数が空の場合に中止
+	set -ue
+
+	ping "${local_ip}" -c 3 &&
+
+# curlでdiscordのwebhookにメッセージをPOST
+	curl -X POST  "${webhook_url}" -H "Content-Type: application/json" -d @- <<EOS
+{
+
+	"username": "${bot_name}",
+	"content": "${message}"
+
+}
+EOS
+
+else
+
+	# 偽の場合はエラーメッセージを表示
+	echo "$0 local_ip webhook_url bot_name message" 1>&2
+
+fi
