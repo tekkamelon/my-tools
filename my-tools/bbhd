@@ -1,10 +1,13 @@
 #!/bin/sh
 
 # 1つ目の引数を変数host_dirに定義
-host_dir=$1
+host_dir="${1}"
 
 # 引数の有無を確認,あれば真,なければ偽
 if [ -n "${host_dir}" ] ; then
+
+	# 以降,変数が空の場合に実行を中止
+	set -eu
 
 	# 真の場合はhttpdを実行,失敗した場合は偽
 	sudo busybox httpd -f -h "${host_dir}" ||
