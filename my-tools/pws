@@ -10,8 +10,10 @@ if [ -p /dev/stdin ] ; then
 	# 真の場合は標準入力に改行を付与し変数に代入
 	input=$(cat - )
 
+# 偽の場合は引数の有無を確認,あれば真,無ければ偽
 elif [ -n "${args}" ] ; then
 	
+	# 偽の場合は引数を変数に代入
 	input="${args}"
 
 else
