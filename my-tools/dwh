@@ -4,7 +4,7 @@
 if [ "${#}" = 4 ] ; then
 
 	# 変数の宣言
-	local_ip="${1}"
+	ip_adress="${1}"
 	webhook_url="${2}"
 	bot_name="${3}"
 	message="${4}"
@@ -13,7 +13,7 @@ if [ "${#}" = 4 ] ; then
 	set -ue
 
 	# 引数で受け取ったURLにパケットを送信,応答がなければwebhookのURLにPOST
-	ping "${local_ip}" -c 3 ||
+	ping "${ip_adress}" -c 3 ||
 
 # curlでdiscordのwebhookにメッセージをPOST
 	curl -X POST  "${webhook_url}" -H "Content-Type: application/json" -d @- <<EOS
@@ -28,6 +28,6 @@ EOS
 else
 
 	# 偽の場合はエラーメッセージを表示
-	echo "$0 local_ip webhook_url bot_name message" 1>&2
+	echo "$0 ip_adress webhook_url bot_name message" 1>&2
 
 fi
