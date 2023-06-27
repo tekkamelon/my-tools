@@ -1,22 +1,26 @@
 #!/bin/sh
 
-# 引数が4つある場合は真,なければ偽
-if [ "${#}" = 4 ] ; then
+# 引数が4つもしくは5つある場合は真,なければ偽
+if [ "${#}" = 4 ] || [ "${#}" = 5 ]; then
 
 	# 変数の宣言
 	ip_adress="${1}"
 	webhook_url="${2}"
 	bot_name="${3}"
 	message="${4}"
+	switch="${5}"
 
 	# 以降,変数が空の場合に中止
 	set -ue
 
-	# 引数で受け取ったURLにパケットを送信,応答がなければwebhookのURLにPOST
-	ping "${ip_adress}" -c 3 ||
+	# 第5引数が"-t"もしくは空の場合は真,それ以外で偽
+	if [ "${switch}" = "-t" ] || [ -z "${switch}" ] ; then
 
-# curlでdiscordのwebhookにメッセージをPOST
-	curl -X POST  "${webhook_url}" -H "Content-Type: application/json" -d @- <<EOS
+		# 疎通確認できれば後続のコマンドを実行
+		ping "${ip_adress}" -c 3 &&
+
+		# 真の場合はcurlでdiscordのwebhookにメッセージをPOST
+		curl -X POST  "${webhook_url}" -H "Content-Type: application/json" -d @- <<EOS
 {
 
 	"username": "${bot_name}",
@@ -24,6 +28,24 @@ if [ "${#}" = 4 ] ; then
 
 }
 EOS
+	
+	elif [ "${switch}" = "-f" ] ; then
+
+		# 疎通確認できなれけば後続のコマンドを実行
+		ping "${ip_adress}" -c 3 ||
+
+		# curlでdiscordのwebhookにメッセージをPOST
+		curl -X POST  "${webhook_url}" -H "Content-Type: application/json" -d @- <<EOS
+{
+
+	"username": "${bot_name}",
+	"content": "${message}"
+
+}
+EOS
+	
+	fi
+
 
 else
 
