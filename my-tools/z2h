@@ -9,7 +9,7 @@ if [ -p /dev/stdin ] ; then
     echo "${input_string}" |
         
 	# 全角英数,スペース,スラッシュ,その他記号をを半角に置換
-	sed -e 'y/０-９Ａ-Ｚ　／（）’”！？/0-9A-Z \/\(\)'\''"\!\?/' -e 'y/ａ-ｚ/a-z/'
+	sed -e 'y/ＡＢＣＤＥＦＧＨＩＪＫＬＭＮＯＰＱＲＳＴＵＶＷＸＹＺａｂｃｄｅｆｇｈｉｊｋｌｍｎｏｐｑｒｓｔｕｖｗｘｙｚ０１２３４５６７８９/ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789/' -e 'y/　／（）’”！？/ \/\(\)'\''"\!\?/'
 
 # 偽の場合は引数の数を確認,0以外で真,それ以外で偽
 elif [ "${#}" != 0 ] ; then
@@ -18,8 +18,8 @@ elif [ "${#}" != 0 ] ; then
 	args="${1}"
 
     # 全角英数,スペース,その他記号をを半角に置換し上書き保存
-	sed  -i -e 'y/０-９Ａ-Ｚ　／（）’”！？/0-9A-Z \/\(\)'\''"\!\?/' -e 'y/ａ-ｚ/a-z/' "${args}"
-	
+	sed -i -e 'y/ＡＢＣＤＥＦＧＨＩＪＫＬＭＮＯＰＱＲＳＴＵＶＷＸＹＺａｂｃｄｅｆｇｈｉｊｋｌｍｎｏｐｑｒｓｔｕｖｗｘｙｚ０１２３４５６７８９/ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789/' -e 'y/　／（）’”！？/ \/\(\)'\''"\!\?/' "${args}"
+
 	cat "${args}"
 
 else
