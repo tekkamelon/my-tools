@@ -1,0 +1,25 @@
+#!/bin/sh -eu
+
+# 変数argsに第1引数を代入
+args=${1}
+
+# argsを加工,変数に代入
+output_file=$(
+
+	echo "${args}" | 
+
+	awk -F"/" '{
+
+		# 拡張子".c"を".out"に置換
+		sub( ".c$" , ".out")
+
+		# "/tmp/"と変換後のファイル名を出力
+		print "/tmp/"$NF
+
+	}'
+
+)
+
+# 引数のファイルと実行バイナリの出力先を指定
+gcc "${args}" -o "${output_file}"
+
