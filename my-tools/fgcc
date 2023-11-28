@@ -1,12 +1,13 @@
 #!/bin/sh -eu
 
-# 変数argsに第1引数を代入
-args=${1}
+# 変数input_fileに第1引数を代入
+input_file=${1}
+option_args=${2}
 
-# argsを加工,変数に代入
+# input_fileを加工,変数に代入
 output_file=$(
 
-	echo "${args}" | 
+	echo "${input_file}" | 
 
 	awk -F"/" '{
 
@@ -21,5 +22,5 @@ output_file=$(
 )
 
 # 引数のファイルと実行バイナリの出力先を指定
-gcc "${args}" -o "${output_file}"
+gcc "${input_file}" -o "${output_file}" "${option_args}"
 
