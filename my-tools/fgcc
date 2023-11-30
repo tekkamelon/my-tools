@@ -1,26 +1,37 @@
-#!/bin/sh -eu
+#!/bin/sh
 
-# 変数input_fileに第1引数を代入
+# ====== 環境変数の設定 ======
+# ロケールの設定
+export LC_ALL=C
+export LANG=C
+
+# GNU coreutilsの挙動をPOSIXに準拠
+export POSIXLY_CORRECT=1
+# ====== 環境変数の設定ここまで ======
+
+
+# 変数"input_file"に第1引数を代入
 input_file=${1}
+
+# 変数"option_args"に第2引数を代入
 option_args=${2}
 
-# input_fileを加工,変数に代入
-output_file=$(
+# "input_file"からファイル名のみを抽出
+output_file=$(basename "${input_file}")
 
-	echo "${input_file}" | 
+# 変数展開でファイル名から拡張子を削除,"/tmp/"を行頭に,拡張子を".out"で出力
+output_file="/tmp/${output_file%.c}.out"
 
-	awk -F"/" '{
+# "option_args"があれば真,なければ偽
+if [ -n "${option_args}" ] ; then
 
-		# 拡張子".c"を".out"に置換
-		sub( ".c$" , ".out")
+	# 真の場合は"option_args"を引数に追加
+	gcc "${input_file}" -o "${output_file}" "${option_args}"
 
-		# "/tmp/"と変換後のファイル名を出力
-		print "/tmp/"$NF
+else
 
-	}'
+	# 偽の場合は引数のファイルと実行バイナリの出力先を指定
+	gcc "${input_file}" -o "${output_file}"
 
-)
-
-# 引数のファイルと実行バイナリの出力先を指定
-gcc "${input_file}" -o "${output_file}" "${option_args}"
+fi
 
