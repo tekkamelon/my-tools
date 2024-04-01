@@ -1,11 +1,9 @@
-#!/bin/sh -eu
+#!/bin/sh -euxv
 
 music_dir=$(grep ^music_directory "${HOME}"/.config/mpd/mpd.conf | cut -d"\"" -f2)
 
-mpc_dir=$(mpc current -f "%file%" | xargs dirname)
+mpc_current_info=$(mpc current -f "%file%" | xargs dirname | sed -n 1p)
 
-mpc_status=$(mpc status)
+img_dir="${music_dir}/${mpc_current_info}/Folder.jpg"
 
-img_dir="${music_dir}/${mpc_dir}/Folder.jpg"
-
-notify-send "${mpc_status}" -i "${img_dir}" &
+notify-send "$(mpc status)" -i "${img_dir}" &
