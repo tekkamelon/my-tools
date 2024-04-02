@@ -1,9 +1,15 @@
-#!/bin/sh -euxv
+#!/bin/sh -eux
 
+# mpd管理下のディレクトリの抽出
 music_dir=$(grep ^music_directory "${HOME}"/.config/mpd/mpd.conf | cut -d"\"" -f2)
 
-mpc_current_info=$(mpc current -f "%file%" | xargs dirname | sed -n 1p)
+# 再生中の曲の相対パスを抽出
+current_song=$(mpc current -f "%file%")
 
-img_dir="${music_dir}/${mpc_current_info}/Folder.jpg"
+# ディレクトリのみ抽出
+song_path=$(dirname "${current_song}")
+
+# カバーアートまでの絶対パス
+img_dir="${music_dir}/${song_path}/Folder.jpg"
 
 notify-send "$(mpc status)" -i "${img_dir}" &
