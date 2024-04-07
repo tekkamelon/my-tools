@@ -1,7 +1,20 @@
-#!/bin/sh -eux
+#!/bin/sh -eu
 
-# mpd管理下のディレクトリの抽出
-music_dir=$(grep ^music_directory "${HOME}"/.config/mpd/mpd.conf | cut -d"\"" -f2)
+if [ -e "${HOME}/.config/mpd/mpd.conf" ] ; then
+
+	# mpd管理下のディレクトリの抽出
+	music_dir=$(grep ^music_directory "${HOME}"/.config/mpd/mpd.conf | cut -d"\"" -f2)
+
+elif [ -e "/etc/mpd.conf" ] ; then
+
+	# mpd管理下のディレクトリの抽出
+	music_dir=$(grep ^music_directory "/etc/mpd.conf" | cut -d"\"" -f2)
+
+else
+
+	exit 1
+
+fi
 
 # 再生中の曲の相対パスを抽出
 current_song=$(mpc current -f "%file%")
