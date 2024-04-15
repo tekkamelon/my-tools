@@ -1,0 +1,14 @@
+#!/bin/sh -eu
+
+input_format="${1}"
+output_format="${2}"
+
+list=$(ls) 
+
+# ".flac"ファイルのから拡張子以外を抽出
+filename=$(echo "${list}" | grep "./*.${input_format}" | awk -F".${input_format}" '{print $1}')
+
+# 論理プロセッサー数
+core=$(grep -c "processor" /proc/cpuinfo)
+
+echo "${filename}" | xargs -I{} -P"${core}" ffmpeg -i {}."${input_format}" {}."${output_format}"
