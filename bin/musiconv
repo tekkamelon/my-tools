@@ -1,14 +1,25 @@
 #!/bin/sh -eu
 
-input_format="${1}"
-output_format="${2}"
+args="${*}"
 
-list=$(ls) 
+if [ -n "${args}" ] ; then
 
-# ".flac"ファイルのから拡張子以外を抽出
-filename=$(echo "${list}" | grep "./*.${input_format}" | awk -F".${input_format}" '{print $1}')
+	input_format="${1}"
+	output_format="${2}"
 
-# 論理プロセッサー数
-core=$(grep -c "processor" /proc/cpuinfo)
+	list=$(ls) 
 
-echo "${filename}" | xargs -I{} -P"${core}" ffmpeg -i {}."${input_format}" {}."${output_format}"
+	# "input_format"ファイルから拡張子を削除
+	filename=$(echo "${list}" | grep "./*.${input_format}" | awk -F".${input_format}" '{print $1}')
+
+	# 論理プロセッサ数
+	core=$(grep -c "processor" /proc/cpuinfo)
+
+	echo "${filename}" | xargs -I{} -P"${core}" ffmpeg -i {}."${input_format}" {}."${output_format}"
+
+else
+
+	# エラーメッセージを出力
+	echo "Error: please enter args" > /dev/stderr
+
+fi
