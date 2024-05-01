@@ -1,0 +1,26 @@
+#!/bin/sh -eu
+
+# 現在のディレクトリ
+current_dir=$(pwd)
+
+# 引数を変数に代入
+working_dir="${*}"
+
+#引数があれば真
+if [ -n "${working_dir}" ] ; then
+
+	cd "${working_dir}"
+
+	# 非対話的,高いビットレートで出力
+	abcde -N -q high
+
+	ls "${working_dir}" & eject
+
+else
+
+	# エラーメッセージを出力
+	echo "Error: please enter args" > /dev/stderr
+
+fi
+
+cd "${current_dir}"
