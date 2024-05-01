@@ -1,0 +1,24 @@
+#!/bin/sh -eu
+
+if [ -p /dev/stdin ] ; then
+
+	# 真の場合は標準入力を変数に代入,非対話的に処理
+	input_string=$(cat - )
+
+    echo "${input_string}" |
+  
+	# シフトJISからUTF-8に変換
+	 iconv -f sjis -t utf8 |
+
+	 # 拙作コマンドで全角文字を半角に変換
+	 z2h | 
+
+	 # 不要な部分の削除
+	 sed -e '1d' -e "s/\"=\"//g" -e "s/\"\"//g" -e "s/\"//g" | cut -d"," -f1-16
+	
+else
+
+	# 偽の場合はメッセージを標準エラー出力に表示
+	echo "please stdin!" 1>&2
+
+fi
