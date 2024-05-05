@@ -1,11 +1,20 @@
 #!/bin/sh -eu
 
 # ====== 変数の設定 ======
+# ロケールの設定
+export LC_ALL=C
+export LANG=C
+
 # 現在のディレクトリ
 current_dir=$(pwd)
 
 # 引数で指定されたディレクトリ
 working_dir="${*}"
+
+# カバーアートのディレクトリ
+coverart="albumart_backup"
+# ====== 変数の設定ここまで ======
+
 
 #引数があれば真
 if [ -n "${working_dir}" ] ; then
@@ -15,8 +24,8 @@ if [ -n "${working_dir}" ] ; then
 	# 非対話的に処理,カバーアートを取得
 	abcde -N -G -B
 
-	# アルバムアートのパスを取得
-	albumart_dir=$(find ./ -d -name "albumart_backup" 2> /dev/null)
+	# カバーアートのパスを取得
+	albumart_dir=$(find ./ -d -name "${coverart}" 2> /dev/null)
 
 	cd "${albumart_dir}"
 
@@ -24,7 +33,7 @@ if [ -n "${working_dir}" ] ; then
 
 	cd ../
 
-	rmdir albumart_backup
+	rmdir "${coverart}"
 
 else
 
