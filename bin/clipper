@@ -1,8 +1,5 @@
 #!/bin/sh -eu
 
-# 名前付きパイプを作成
-mkfifo /tmp/pre.fifo /tmp/post.fifo
-
 # 現在のディレクトリ
 current_dir=$(pwd)
 
@@ -17,25 +14,8 @@ if [ -n "${working_dir}" ] ; then
 
 	cd "${working_dir}"
 
-	# 非対話的に処理
-	abcde -N 
-
-	# リッピング後のディレクトリ構造を名前付きパイプに流す
-	ls > /tmp/post.fifo &
-	
-	diff_dir=$(diff -c /tmp/pre.fifo /tmp/post.fifo |
-
-	awk '/^\+ /{
-
-		sub("\+ " , "")
-
-		print $0
-
-	}')
-
-	find "${diff_dir}" | awk 'NR ==1' | xargs -I{} ffmpeg -i "${diff_dir}"/{} 2>&1 |
-	
-	grep ARTIST | awk -F": " '{print $2}' | xargs mkdir
+	# 非対話的に処理,カバーアートを取得
+	abcde -N -G -B
 
 else
 
@@ -45,5 +25,3 @@ else
 fi
 
 cd "${current_dir}"
-
-rm /tmp/pre.fifo /tmp/post.fifo &
