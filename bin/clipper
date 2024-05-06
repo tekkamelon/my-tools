@@ -1,4 +1,4 @@
-#!/bin/sh -eu
+#!/bin/sh -euxv
 
 # ====== 変数の設定 ======
 # ロケールの設定
@@ -6,7 +6,7 @@ export LC_ALL=C
 export LANG=C
 
 # 現在のディレクトリ
-current_dir=$(pwd)
+current_dir="${PWD}"
 
 # 引数で指定されたディレクトリ
 working_dir="${*}"
@@ -21,19 +21,19 @@ if [ -n "${working_dir}" ] ; then
 
 	cd "${working_dir}"
 
-	# 非対話的に処理,カバーアートを取得
-	abcde -N -G -B
+	# 非対話的に処理,カバーアートを取得,埋め込み
+	abcde -N -G -B &&
 
-	# カバーアートのパスを取得
-	albumart_dir=$(find ./ -d -name "${coverart}" 2> /dev/null)
-
-	cd "${albumart_dir}"
+	# カバーアートのパスに移動
+	cd "$(find "${PWD}" -d -name "${coverart}" 2> /dev/null)"
 
 	mv Folder.jpg ../
 
 	cd ../
 
-	rmdir "${coverart}"
+	rmdir albumart_backup
+
+	cd "${current_dir}"
 
 else
 
@@ -42,4 +42,3 @@ else
 
 fi
 
-cd "${current_dir}"
