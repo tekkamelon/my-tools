@@ -1,12 +1,12 @@
-#!/bin/sh -euxv
+#!/bin/sh -eu
 
 # ====== 変数の設定 ======
 # ロケールの設定
 export LC_ALL=C
 export LANG=C
 
-# 現在のディレクトリ
-current_dir="${PWD}"
+# 実行時点のディレクトリ
+pre_dir="${PWD}"
 
 # 引数で指定されたディレクトリ
 working_dir="${*}"
@@ -31,9 +31,9 @@ if [ -n "${working_dir}" ] ; then
 
 	cd ../
 
-	rmdir albumart_backup
+	rmdir "${coverart}" 
 
-	cd "${current_dir}"
+	cd "${pre_dir}"
 
 else
 
@@ -41,4 +41,3 @@ else
 	echo "Error: please enter args" > /dev/stderr
 
 fi
-
