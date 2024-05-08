@@ -1,0 +1,20 @@
+#!/bin/sh -eu
+
+# ロケールの設定
+export LC_ALL=C
+export LANG=C
+
+# "git diff"の結果
+git_diff_result=$(git diff)
+
+if [ -n "${git_diff_result}" ] ; then
+
+	# 真の場合はgit diffの結果をnvimに渡す
+	echo "${git_diff_result}" | nvim - -R -u "$HOME/.config/nvim/light_init.lua"
+
+else
+
+	# 偽の場合はステータスを表示
+	git status
+
+fi
