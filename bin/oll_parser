@@ -18,7 +18,7 @@ elif [ "${#}" != 0 ] ; then
 	args="${1}"
 
 	# シフトJISからUTF-8に変換
-	 iconv -f sjis -t utf8 |
+	echo "${args}" | iconv -f sjis -t utf8 |
 
 	 # 不要な部分の削除
 	 sed -e '1d' -e "s/\"=\"//g" -e "s/\"\"//g" -e "s/\"//g" | cut -d"," -f1-16
