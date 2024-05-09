@@ -5,6 +5,18 @@
 export LC_ALL=C
 export LANG=C
 
+# ".abcde.conf"があれば真
+if [ -e "${HOME}"/.abcde.conf ] ; then
+
+	# 設定ファイルの変数を読み込み
+	. "${HOME}/.abcde.conf"
+
+else
+
+	export ALBUMARTFILE="Folder.jpg"
+
+fi
+
 # 実行時点のディレクトリ
 pre_dir="${PWD}"
 
@@ -21,13 +33,13 @@ if [ -n "${working_dir}" ] ; then
 
 	cd "${working_dir}"
 
-	# 非対話的に処理,カバーアートを取得,埋め込み
+	# 非対話的に処理,カバーアートを取得,ファイルに埋め込み
 	abcde -N -G -B &&
 
 	# カバーアートのパスに移動
 	cd "$(find "${PWD}" -d -name "${coverart}" 2> /dev/null)"
 
-	mv Folder.jpg ../
+	mv "${ALBUMARTFILE}" ../
 
 	cd ../
 
