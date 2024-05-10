@@ -22,7 +22,19 @@ if [ -p /dev/stdin ] ; then
 	iconv -f sjis -t utf8 |
 
 	# 不要な部分の削除
-	sed -e '1d' -e "s/\"=\"//g" -e "s/\"\"//g" -e "s/\"//g" |
+	# sed -e '1d' -e "s/\"=\"//g" -e "s/\"\"//g" -e "s/\"//g" |
+	awk -F"," '
+	
+		if(NR != 1){
+
+			gsub("\"=\"" , "")
+			gsub("\"\"" , "")
+			gsub("\"" , "")
+
+			print $0
+
+		}
+	' |
 
 	# 行末の","の削除
 	cut -d"," -f1-16
