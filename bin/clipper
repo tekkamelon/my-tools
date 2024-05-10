@@ -14,6 +14,7 @@ if [ -e "${HOME}"/.abcde.conf ] ; then
 else
 
 	export ALBUMARTFILE="Folder.jpg"
+	export OUTPUTDIR="${PWD}"
 
 fi
 
@@ -23,33 +24,34 @@ pre_dir="${PWD}"
 # 引数で指定されたディレクトリ
 working_dir="${*}"
 
-# カバーアートのディレクトリ
-coverart="albumart_backup"
-# ====== 変数の設定ここまで ======
-
-
 #引数があれば真
 if [ -n "${working_dir}" ] ; then
 
 	cd "${working_dir}"
 
-	# 非対話的に処理,カバーアートを取得,ファイルに埋め込み
-	abcde -N -G -B &&
-
-	# カバーアートのパスに移動
-	cd "$(find "${PWD}" -d -name "${coverart}" 2> /dev/null)"
-
-	mv "${ALBUMARTFILE}" ../
-
-	cd ../
-
-	rmdir "${coverart}" 
-
-	cd "${pre_dir}"
-
 else
 
-	# エラーメッセージを出力
-	echo "Error: please enter args" > /dev/stderr
+	cd "${OUTPUTDIR}"
 
 fi
+
+# カバーアートのディレクトリ
+coverart="albumart_backup"
+# ====== 変数の設定ここまで ======
+
+
+# 非対話的に処理,カバーアートを取得,ファイルに埋め込み
+abcde -N -G -B &&
+
+# カバーアートのパスに移動
+coverart_dir=$(find "${PWD}" -d -name "${coverart}" 2> /dev/null)
+cd "${coverart_dir}"
+
+mv "${ALBUMARTFILE}" ../
+
+cd ../
+
+rmdir "${coverart}" ;
+
+cd "${pre_dir}"
+
