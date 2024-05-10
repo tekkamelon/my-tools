@@ -1,15 +1,5 @@
 #!/bin/sh -eu
 
-# ====== 変数の設定 ======
-# ロケールの設定
-export LC_ALL=C
-export LANG=C
-
-# GNU coreutilsの挙動をPOSIXに準拠
-export POSIXLY_CORRECT=1
-# ====== 変数の設定ここまで ======
-
-
 # 標準入力の有無を確認,あれば真,無ければ偽
 if [ -p /dev/stdin ] ; then
 
