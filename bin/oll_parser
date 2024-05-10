@@ -10,23 +10,21 @@ export POSIXLY_CORRECT=1
 # ====== 変数の設定ここまで ======
 
 
-# 標準入力の有無を確認,あれば真,無ければ偽
-if [ -p /dev/stdin ] ; then
+# パーサー本体
+parser () {
 
-	# 真の場合は標準入力を変数に代入,非対話的に処理
-	input_string=$(cat - )
+	cat - |
 
-    echo "${input_string}" |
-  
 	# シフトJISからUTF-8に変換
 	iconv -f sjis -t utf8 |
 
 	# 不要な部分の削除
-	# sed -e '1d' -e "s/\"=\"//g" -e "s/\"\"//g" -e "s/\"//g" |
-	awk -F"," '
-	
+	awk -F"," '{
+
+		# 1行目以外で真
 		if(NR != 1){
 
+			# 不要な箇所の削除
 			gsub("\"=\"" , "")
 			gsub("\"\"" , "")
 			gsub("\"" , "")
@@ -34,11 +32,22 @@ if [ -p /dev/stdin ] ; then
 			print $0
 
 		}
-	' |
+
+	}' |
 
 	# 行末の","の削除
 	cut -d"," -f1-16
-	
+
+}
+
+# 標準入力の有無を確認,あれば真,無ければ偽
+if [ -p /dev/stdin ] ; then
+
+	# 真の場合は標準入力を変数に代入,非対話的に処理
+	input_string=$(cat - )
+
+    echo "${input_string}" | parser
+  
 # 偽の場合は引数の数を確認,0以外で真
 elif [ "${#}" != 0 ] ; then
 
@@ -46,9 +55,7 @@ elif [ "${#}" != 0 ] ; then
 	args="${1}"
 
 	# シフトJISからUTF-8に変換
-	cat < "${args}" | iconv -f sjis -t utf8 |
-
-	 sed -e '1d' -e "s/\"=\"//g" -e "s/\"\"//g" -e "s/\"//g" | cut -d"," -f1-16
+	cat < "${args}" | parser
 
 else
 
@@ -56,3 +63,4 @@ else
 	echo "please stdin!" 1>&2
 
 fi
+
