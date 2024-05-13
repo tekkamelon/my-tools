@@ -90,3 +90,11 @@
 ## fgcc
 
 - C言語の即席コンパイル用
+
+## songinfo
+
+- mpdで再生中の曲及びカバーアートを通知
+
+## clipper
+
+- abcdeによりcli上でCDリッピング
