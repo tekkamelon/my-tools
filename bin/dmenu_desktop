@@ -1,6 +1,7 @@
 #!/bin/sh
 
 # 環境変数の設定
+export LC_ALL=C
 export LANG=C
 
 # 引数をargsに代入

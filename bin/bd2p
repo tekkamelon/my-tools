@@ -1,6 +1,6 @@
 #!/bin/sh -eu
 
-barcode -b "$(cat "${1}" | 
+barcode -b "$(cat < "${1}" | 
 
 	# awkで区切り文字をカンマに指定
 	awk -F"," '{
