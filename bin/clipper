@@ -2,7 +2,7 @@
 
 # shellcheck disable=SC1091
 
-# ====== 変数の設定 ======
+# ====== 変数の処理 ======
 # ロケールの設定
 export LC_ALL=C
 export LANG=C
@@ -43,21 +43,39 @@ fi
 
 # カバーアートのディレクトリ
 coverart="albumart_backup"
-# ====== 変数の設定ここまで ======
+
+# CDDBから取得したデータ
+acquired_data=$(abcde -a cddb -N 2>&1)
+
+# 取得したデータのチェック用
+cddb_check=$(echo "${acquired_data}" | grep "error \"Not Found\"")
+# ====== 変数の処理ここまで ======
 
 
-# 非対話的に処理,カバーアートを取得,ファイルに埋め込み
-abcde -N -G -B &&
+# CDDBからデータを取得できなければ真
+if [ "${cddb_check#*error }" = "\"Not Found\"" ] ; then
 
-# カバーアートのパスに移動
-coverart_dir=$(find "${PWD}" -d -name "${coverart}" 2> /dev/null)
-cd "${coverart_dir}"
+	# エラーメッセージを出力
+	echo "Error: CD data is not found for CDDB!" 1>&2
 
-mv "${ALBUMARTFILE}" ../
+else
 
-cd ../
+	# 非対話的に処理,カバーアートを取得,ファイルに埋め込み
+	abcde -N -G -B &&
 
-rmdir "${coverart}" ;
+	# # カバーアートのパスに移動
+	coverart_dir=$(find "${PWD}" -d -name "${coverart}" 2> /dev/null)
+	cd "${coverart_dir}"
 
-cd "${pre_dir}"
+	mv "${ALBUMARTFILE}" ../
+
+	cd ../
+
+	rmdir "${coverart}" ;
+
+	cd "${pre_dir}"
+
+fi
+
+eject
 
