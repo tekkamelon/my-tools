@@ -7,6 +7,8 @@
 export LC_ALL=C
 export LANG=C
 
+export EJECTCD=n
+
 # ".abcde.conf"があれば真
 if [ -e "${HOME}"/.abcde.conf ] ; then
 
@@ -48,7 +50,9 @@ coverart="albumart_backup"
 acquired_data=$(abcde -a cddb -N 2>&1)
 
 # 取得したデータのチェック用
+set +eu
 cddb_check=$(echo "${acquired_data}" | grep "error \"Not Found\"")
+set -eu
 # ====== 変数の処理ここまで ======
 
 
@@ -60,8 +64,8 @@ if [ "${cddb_check#*error }" = "\"Not Found\"" ] ; then
 
 else
 
-	# 非対話的に処理,カバーアートを取得,ファイルに埋め込み
-	abcde -N -G -B &&
+	# 非対話的に処理,カバーアートを取得,ファイルに埋め込み,中間ファイルを生成しない
+	abcde -N -G -B -P -p -a cddb,encode,tag,move,clean &&
 
 	# # カバーアートのパスに移動
 	coverart_dir=$(find "${PWD}" -d -name "${coverart}" 2> /dev/null)
