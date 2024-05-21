@@ -1,25 +1,35 @@
 #!/bin/sh -eu
 
-# 標準入力の有無を確認,あれば真,無ければ偽
-if [ -p /dev/stdin ] ; then
+# shellcheck disable=SC1112
 
-	# 真の場合は標準入力を変数に代入,非対話的に処理
-	input_string=$(cat - )
+# 標準入力と引数の両方があれば真,無ければ偽
+if [ -p /dev/stdin ] && [ "${#}" != 0 ] ; then
 
-    echo "${input_string}" |
-        
+	# 第1引数を変数に代入
+	args="${1}"
+
+    cat - "${args}" |
+
+	# 全角英数,スペース,スラッシュ,その他記号をを半角に置換
+	sed -e 'y/ＡＢＣＤＥＦＧＨＩＪＫＬＭＮＯＰＱＲＳＴＵＶＷＸＹＺａｂｃｄｅｆｇｈｉｊｋｌｍｎｏｐｑｒｓｔｕｖｗｘｙｚ０１２３４５６７８９/ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789/' -e 'y/　／（）’”！？/ \/\(\)'\''"\!\?/'
+
+# 真の場合は標準出力があれば真
+elif [ -p /dev/stdin ] ; then
+
+    cat - |
+
 	# 全角英数,スペース,スラッシュ,その他記号をを半角に置換
 	sed -e 'y/ＡＢＣＤＥＦＧＨＩＪＫＬＭＮＯＰＱＲＳＴＵＶＷＸＹＺａｂｃｄｅｆｇｈｉｊｋｌｍｎｏｐｑｒｓｔｕｖｗｘｙｚ０１２３４５６７８９/ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789/' -e 'y/　／（）’”！？/ \/\(\)'\''"\!\?/'
 
 # 偽の場合は引数の数を確認,0以外で真
 elif [ "${#}" != 0 ] ; then
     
-	# 第1引数を変数に代入
 	args="${1}"
 
     # 全角英数,スペース,その他記号をを半角に置換し上書き保存
 	sed -i -e 'y/ＡＢＣＤＥＦＧＨＩＪＫＬＭＮＯＰＱＲＳＴＵＶＷＸＹＺａｂｃｄｅｆｇｈｉｊｋｌｍｎｏｐｑｒｓｔｕｖｗｘｙｚ０１２３４５６７８９/ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789/' -e 'y/　／（）’”！？/ \/\(\)'\''"\!\?/' "${args}"
 
+	# 保存したファイルを出力
 	cat "${args}"
 
 else
