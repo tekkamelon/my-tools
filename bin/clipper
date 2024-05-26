@@ -7,8 +7,6 @@
 export LC_ALL=C
 export LANG=C
 
-export EJECTCD=n
-
 # ".abcde.conf"があれば真
 if [ -e "${HOME}"/.abcde.conf ] ; then
 
@@ -17,6 +15,7 @@ if [ -e "${HOME}"/.abcde.conf ] ; then
 
 elif [ -e "/etc/abcde.conf" ] ; then
 
+	# 設定ファイルの変数を読み込み
 	. /etc/abcde.conf
 
 else
@@ -67,15 +66,17 @@ else
 	# 非対話的に処理,カバーアートを取得,ファイルに埋め込み,中間ファイルを生成しない
 	abcde -N -G -B -P -p -a cddb,encode,tag,move,clean &&
 
-	# # カバーアートのパスに移動
+	# カバーアートのディレクトリを取得,エラー出力を捨てる
 	coverart_dir=$(find "${PWD}" -d -name "${coverart}" 2> /dev/null)
+
+	# # カバーアートのパスに移動
 	cd "${coverart_dir}"
 
 	mv "${ALBUMARTFILE}" ../
 
 	cd ../
 
-	rmdir "${coverart}" ;
+	rmdir "${coverart}"
 
 	cd "${pre_dir}"
 
