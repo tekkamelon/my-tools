@@ -2,6 +2,7 @@
 
 # 環境変数の設定
 export LANG=C
+export LC_ALL=C
 
 # 標準入力を変数に代入
 pipe=$(cat - )
