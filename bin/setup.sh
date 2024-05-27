@@ -64,6 +64,7 @@ mkfifo /tmp/setup.fifo
 	cp dotfiles/.*shrc "${HOME}"/
 	cp -r dotfiles/.config/* "${HOME}"/.config/
 	cp -r dotfiles/bin/* "${HOME}"/.local/bin/
+	cp dotfiles/.config/user-dirs.dirs "${HOME}"/.config/
 
 	# neovimのダウンロード,セットアップ
 	wget -q -O nvim https://github.com/neovim/neovim/releases/download/v0.9.2/nvim.appimage
@@ -73,7 +74,7 @@ mkfifo /tmp/setup.fifo
 	sudo chmod 755 "${HOME}"/.local/bin/nvim
 
 	# *.vimファイルを削除
-	find "${HOME}"/.condfig/nvim --name "*.vim" -exec + rm
+	find "${HOME}"/.config/nvim --name "*.vim" -exec + rm
 
 	# 名前付きパイプの削除
 	rm /tmp/setup.fifo
