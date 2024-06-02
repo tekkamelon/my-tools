@@ -1,0 +1,19 @@
+#!/bin/sh -eu
+
+# 標準入力と引数の両方があれば真,無ければ偽
+if [ -p /dev/stdin ] && [ "${#}" != 0 ] ; then
+
+	input=$(cat -)
+	# 第1引数を変数に代入
+	args="${1}"
+
+    field_num=$(echo "${input}" | sed -n -e '1p' | tr "," "\n" | sed -n "/${args}/=")
+    
+	echo "${input}" | awk -F"," -v fn="${field_num}" '{print $fn}'
+
+else
+
+	# 偽の場合はメッセージを標準エラー出力に表示
+	echo "please stdin and argment!" 1>&2
+
+fi
