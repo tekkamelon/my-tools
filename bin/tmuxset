@@ -9,15 +9,10 @@ git_settion_check=$(
 
 	echo "${tmux_check}" |
 
-	# 行頭がgitにマッチした行に処理
-	awk '/^git/{
+	# 第1フィールドが"git:"かつ最終フィールドが"(attached)"ではない場合に真
+	awk '$1 == "git:" && $NF != "(attached)"{
 
-		# 最終フィールドが"(attached)"でなければ真
-		if($NF != "(attached)"){
-
-			print $0
-
-		}
+		print $0
 
 	}'
 
