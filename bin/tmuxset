@@ -63,9 +63,9 @@ else
 
 		# 作成したセッションのペインを分割
 		tmux split-window -v -t git &
-		tmux split-window -v -t httpd &
-		tmux split-window -v -t mpd &
-		tmux split-window -v -t ssh ;
+		tmux split-window -v -t docker &
+		tmux split-window -v -t music &
+		tmux split-window -v -t network ;
 
 	}
 
