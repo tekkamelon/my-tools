@@ -1,19 +1,55 @@
 #!/bin/sh
 
+# ====== 変数の設定 ======
 # セッション一覧を変数に代入
 tmux_check=$(tmux ls)
 
-# tmuxの起動を確認,あれば真,なければ偽
-if [ -n "${tmux_check}" ] ; then
+# "git"セッションの確認
+git_settion_check=$(
+
+	echo "${tmux_check}" |
+
+	# 行頭がgitにマッチした行に処理
+	awk '/^git/{
+
+		# 最終フィールドが"(attached)"でなければ真
+		if($NF != "(attached)"){
+
+			print $0
+
+		}
+
+	}'
+
+)
+	
+# 未アタッチのセッション一覧の先頭行
+last_line=$(
+
+	echo "${tmux_check}" | grep -v "(attached)$" |
+
+	awk -F":" 'NR == 1{print $1}'
+
+)
+# ====== 変数の設定ここまで ======
+
+
+# tmuxの起動を確認かつ"git"セッションにアタッチしていなければ真
+if [ -n "${tmux_check}" ] && [ -n "${git_settion_check}" ] ; then
 
 	# 真の場合は"git"セッションにアタッチ,なければ最後のセッションにアタッチ
-	tmux a -t git || tmux a
+	tmux a -t git
+
+# 偽の場合はtmuxが起動していれば真
+elif [ -n "${tmux_check}" ] ; then
+
+	tmux a -t "${last_line}"
 
 else
 
 	# 偽の場合の処理
 	# ホームディレクトリに戻る
-	cd || exit
+	cd "${HOME}" || exit
 
 	# メッセージを標準エラー出力に表示
 	echo "make session" 1>&2
@@ -21,9 +57,9 @@ else
 	# 新規セッションを作成,即デタッチ
 	tmux new-session -d -s edit
 	tmux new-session -d -s git 
-	tmux new-session -d -s httpd
-	tmux new-session -d -s mpd 
-	tmux new-session -d -s ssh 
+	tmux new-session -d -s docker
+	tmux new-session -d -s music
+	tmux new-session -d -s network
 	tmux new-session -d -s command 
 	tmux new-session -d ;
 
@@ -42,3 +78,4 @@ else
 	tmux a -t edit
 
 fi
+
