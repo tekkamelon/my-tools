@@ -61,7 +61,16 @@ else
 	# グループ化し並列に処理
 	{ 
 
-		# 作成したセッションのペインを分割
+		# 新規ウィンドウを作成
+		tmux new-window -t git &
+		tmux new-window -t git &
+		tmux new-window -t music &
+
+	}
+
+	{ 
+
+		# ペインを分割
 		tmux split-window -v -t git &
 		tmux split-window -v -t docker &
 		tmux split-window -v -t music &
