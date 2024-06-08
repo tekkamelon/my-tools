@@ -1,10 +1,13 @@
 #!/bin/sh
 
 # ====== 変数の設定 ======
+# セッション一覧を変数に代入
+tmux_check=$(tmux ls)
+
 # "git"セッションの確認
 git_settion_check=$(
 
-	tmux ls |
+	echo "${tmux_check}" |
 
 	# 第1フィールドが"git:"かつ最終フィールドが"(attached)"ではない場合に真
 	awk '$1 == "git:" && $NF != "(attached)"{
@@ -18,7 +21,7 @@ git_settion_check=$(
 # 未アタッチのセッション一覧の先頭行
 last_line=$(
 
-	tmux ls | grep -v "(attached)$" |
+	echo "${tmux_check}" | grep -v "(attached)$" |
 
 	awk -F":" 'NR == 1{print $1}'
 
@@ -26,14 +29,14 @@ last_line=$(
 # ====== 変数の設定ここまで ======
 
 
-# tmuxが起動し,かつ"git"セッションにアタッチしていなければ真
-if [ -n "${TMUX}" ] && [ -n "${git_settion_check}" ] ; then
+# tmuxの起動を確認かつ"git"セッションにアタッチしていなければ真
+if [ -n "${tmux_check}" ] && [ -n "${git_settion_check}" ] ; then
 
 	# 真の場合は"git"セッションにアタッチ,なければ最後のセッションにアタッチ
 	tmux a -t git
 
 # 偽の場合はtmuxが起動していれば真
-elif [ -n "${TMUX}" ] ; then
+elif [ -n "${tmux_check}" ] ; then
 
 	tmux a -t "${last_line}"
 
