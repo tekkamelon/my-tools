@@ -1,6 +1,6 @@
 #!/bin/awk -f
 
-# ファイルの頭に追記
+# 変数の処理
 BEGIN{
 
 	# 区切り文字の指定
@@ -8,6 +8,22 @@ BEGIN{
 
 	# 区切り文字を"|"に置換
 	OFS = "|"
+
+	# "-v p="で渡された引数を処理
+	if(p == "center"){
+
+		padding = "|:----:"
+
+	}else if(p == "right"){
+	
+		padding = "|----:"
+
+	# "center"でも"right"でもない場合はデフォルトの左寄せ
+	}else{
+
+		padding = "|----"
+
+	}
 
 }
 
@@ -22,9 +38,9 @@ NR == 1{
 
 	# ヘッダ行以下に挿入
 	# iがフィールド数になるまで1づつ増加
-	for (i = 1; i <=NF; i++)
+	for(i = 1; i <= NF; i++)
 
-		printf "|----"
+		printf padding
 
 	printf "|\n"
 
