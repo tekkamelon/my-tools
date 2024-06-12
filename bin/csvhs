@@ -29,7 +29,7 @@ if [ -p /dev/stdin ] && [ "${#}" != 0 ] ; then
 				printf $i
 
 				# マッチしたフィールド番号を"field_num"に代入
-				field = i
+				field_num = i
 
 			}
 
