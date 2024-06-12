@@ -3,13 +3,48 @@
 # 標準入力と引数の両方があれば真,無ければ偽
 if [ -p /dev/stdin ] && [ "${#}" != 0 ] ; then
 
-	input=$(cat -)
 	# 第1引数を変数に代入
 	args="${1}"
 
-    field_num=$(echo "${input}" | sed -n -e '1p' | tr "," "\n" | sed -n "/${args}/=")
-    
-	echo "${input}" | awk -F"," -v fn="${field_num}" '{print $fn}'
+	cat - |
+
+	awk -v search_str="${args}" '
+
+	BEGIN{
+
+		FS = ","
+
+	}
+
+	# 1行目のみに処理
+	NR == 1{
+
+		# iがフィールド数になるまで1づつ増加
+		for(i = 1; i <=NF; i++)
+
+			# フィールドに"search_str"がマッチすれば真
+			if($i ~ search_str){
+
+				# マッチしたフィールドを出力
+				printf $i
+
+				# マッチしたフィールド番号を"field_num"に代入
+				field = i
+
+			}
+
+			printf "\n"
+
+	}
+
+	# 2行目以降を処理
+	NR >= 2{
+
+		# マッチしたフィールドを出力
+		print $field_num
+
+	}
+	'
 
 else
 
