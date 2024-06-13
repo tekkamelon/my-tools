@@ -9,40 +9,53 @@ git_settion_check=$(
 
 	echo "${tmux_check}" |
 
-	# 第1フィールドが"git:"かつ最終フィールドが"(attached)"ではない場合に真
-	awk '$1 == "git:" && $NF != "(attached)"{
+	awk '
+
+	# 第1フィールドが"git:"かつ最終フィールドが"(attached)"の場合に真
+	$1 == "git:" && $NF == "(attached)"{
 
 		print $0
 
-	}'
+	}
+	'
 
 )
 	
 # 未アタッチのセッション一覧の先頭行
 last_line=$(
 
-	echo "${tmux_check}" | grep -v "(attached)$" |
+	echo "${tmux_check}" |
 
-	awk -F":" 'NR == 1{print $1}'
+	# 区切り文字を":"とスペースに設定
+	awk -F[:" "] '
+
+	$NF != "(attached)"{
+
+		if(NR == 1){
+
+			print $1
+
+		}
+
+	}
+	'
 
 )
 # ====== 変数の設定ここまで ======
 
 
-# tmuxの起動を確認かつ"git"セッションにアタッチしていなければ真
-if [ -n "${tmux_check}" ] && [ -n "${git_settion_check}" ] ; then
+# "git"セッションにアタッチしていれば真
+if [ -n "${git_settion_check}" ] ; then
 
-	# 真の場合は"git"セッションにアタッチ,なければ最後のセッションにアタッチ
-	tmux a -t git
+	tmux a -t "${last_line}"
 
 # 偽の場合はtmuxが起動していれば真
 elif [ -n "${tmux_check}" ] ; then
 
-	tmux a -t "${last_line}"
+	tmux a -t git
 
 else
 
-	# 偽の場合の処理
 	# ホームディレクトリに戻る
 	cd "${HOME}" || exit
 
