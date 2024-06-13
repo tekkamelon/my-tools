@@ -1,0 +1,55 @@
+#!/usr/bin/awk -f
+
+BEGIN{
+
+	# 区切り文字の処理
+	if(fs == ""){
+
+		FS ="," 
+
+	}else{
+
+		FS = fs
+
+	}
+
+}
+
+{
+	# iがフィールド数になるまで1づつ増加
+	for(i = 1; i<= NF; i++){ 
+
+		# 現在の行数と"i"を配列のkey,フィールド番号をvalue
+		field[NR,i] = $i
+
+	} 
+
+}
+
+NF>p{
+
+	# pにフィールド数を代入
+	p = NF
+
+}
+
+END {
+
+	# jがフィールド数になるまで1づつ増加
+    for(j = 1; j<= p; j++){ 
+
+		# strに配列のkeyが1行目かつ"j"を代入
+		str = field[1,j]
+
+		# iが2行目から行数になるまで1づつ増加
+		for(i = 2; i<= NR; i++){
+
+			str = str FS field[i,j]
+
+		}
+
+        print str
+
+    }
+
+}
