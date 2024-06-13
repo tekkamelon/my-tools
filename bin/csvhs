@@ -1,14 +1,12 @@
-#!/bin/sh -eu
+#!/bin/sh -e
 
-# 標準入力と引数の両方があれば真,無ければ偽
-if [ -p /dev/stdin ] && [ "${#}" != 0 ] ; then
+# 第1引数を変数に代入
+search_str="${1}"
 
-	# 第1引数を変数に代入
-	args="${1}"
+cat - |
 
-	cat - |
-
-	awk -v search_str="${args}" '
+# 行列の入れ替え
+awk '
 
 	BEGIN{
 
@@ -16,39 +14,43 @@ if [ -p /dev/stdin ] && [ "${#}" != 0 ] ; then
 
 	}
 
-	# 1行目のみに処理
-	NR == 1{
-
+	{
 		# iがフィールド数になるまで1づつ増加
-		for(i = 1; i <=NF; i++)
+		for(i = 1; i<= NF; i++){ 
 
-			# フィールドに"search_str"がマッチすれば真
-			if($i ~ search_str){
+			# 現在の行数と"i"を配列のkey,フィールド番号をvalue
+			field[NR,i] = $i
 
-				# マッチしたフィールドを出力
-				printf $i
+		} 
 
-				# マッチしたフィールド番号を"field_num"に代入
-				field_num = i
+	}
+
+	NF>p{
+
+		# pにフィールド数を代入
+		p = NF
+
+	}
+
+	END {
+
+		# jがフィールド数になるまで1づつ増加
+		for(j = 1; j<= p; j++){ 
+
+			# strに配列のkeyが1行目かつ"j"を代入
+			str = field[1,j]
+
+			# iが2行目から行数になるまで1づつ増加
+			for(i = 2; i<= NR; i++){
+
+				str = str FS field[i,j]
 
 			}
 
-			printf "\n"
+			print str
+
+		}
 
 	}
 
-	# 2行目以降を処理
-	NR >= 2{
-
-		# マッチしたフィールドを出力
-		print $field_num
-
-	}
-	'
-
-else
-
-	# 偽の場合はメッセージを標準エラー出力に表示
-	echo "please stdin and argment!" 1>&2
-
-fi
+' | grep "${search_str}" | tr "," "\n"
