@@ -41,8 +41,8 @@ END {
 		# strに配列のkeyが1行目かつ"j"を代入
 		str = field[1,j]
 
-		# iが2行目から行数-1になるまで1づつ増加
-		for(i = 2; i<= NR-1; i++){
+		# iが2行目から行数になるまで1づつ増加
+		for(i = 2; i<= NR; i++){
 
 			str = str FS field[i,j]
 
