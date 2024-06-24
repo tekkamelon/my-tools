@@ -1,10 +1,13 @@
 #!/bin/sh
 
 # ====== 変数の設定 ======
+# GNU coreutilsの挙動をPOSIXに準拠
+export POSIXLY_CORRECT=1
+
 # セッション一覧を変数に代入
 tmux_list=$(tmux ls)
 
-# "git"セッションにアタッチされているかを確認
+# "git"セッションにアタッチされているか確認
 git_settion_check=$(
 
 	echo "${tmux_list}" |
@@ -12,6 +15,7 @@ git_settion_check=$(
 	# 区切り文字を":"とスペースに指定
 	awk -F[:" "] '
 
+	# "git"セッションがあるかを確認,なければ何も出力しない
 	$1 == "git" && $NF != "(attached)"{
 
 		print $1
