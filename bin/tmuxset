@@ -1,9 +1,6 @@
 #!/bin/sh
 
 # ====== 変数の設定 ======
-# GNU coreutilsの挙動をPOSIXに準拠
-export POSIXLY_CORRECT=1
-
 # セッション一覧を変数に代入
 tmux_list=$(tmux ls)
 
