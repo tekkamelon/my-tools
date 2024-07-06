@@ -18,7 +18,9 @@ parser () {
 	# Shift-JISからUTF-8に変換
 	iconv -f sjis -t utf8 |
 
-	awk 'BEGIN{
+	awk '
+
+	BEGIN{
 
 		# 区切り文字をカンマに指定
 		FS = ","
@@ -35,7 +37,7 @@ parser () {
 		if(NR != 1){
 
 			# 改行コードをCRLFからLFへ置換
-			gsub("\r", "")
+			gsub("\r" , "")
 
 			# ダブルクォートと"="の削除
 			gsub("\"=\"" , "")
@@ -48,7 +50,11 @@ parser () {
 
 		}
 
-	}'
+	}
+	' |
+
+	# 空行を削除
+	sed '/^$/d'
 
 }
 
