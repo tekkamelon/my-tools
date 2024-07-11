@@ -1,4 +1,6 @@
-#!/bin/sh -e
+#!/bin/sh
+
+set -e
 
 # ====== 変数の設定 ======
 # ロケールの設定
@@ -7,6 +9,18 @@ export LANG=C
 
 # "git diff"の結果
 git_diff_result=$(git diff)
+
+# neovimがあるか確認
+if type nvim > /dev/null 2>&1 ; then
+
+	export EDITOR=nvim
+
+# vimがあるか確認
+elif type vim > /dev/null 2>&1 ; then
+	
+	export EDITOR=vim
+
+fi
 # ====== 変数の設定ここまで ======
 
 
@@ -16,7 +30,7 @@ if [ -n "${git_diff_result}" ] ; then
 	echo "${git_diff_result}" |
 
 	# リードオンリーモードで起動,各種設定を行う
-	nvim - -R -c "set number" -c 'let mapleader="\<Space>"' -c "map <leader>q :q<Enter>"
+	"${EDITOR}" - -R -c "set number" -c 'let mapleader="\<Space>"' -c "map <leader>q :q<Enter>"
 
 else
 
