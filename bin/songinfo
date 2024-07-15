@@ -1,4 +1,6 @@
-#!/bin/sh -eu
+#!/bin/sh
+
+set -eu
 
 # mpdの設定ファイルの有無を確認
 if [ -e "${HOME}/.config/mpd/mpd.conf" ] ; then
@@ -8,7 +10,6 @@ if [ -e "${HOME}/.config/mpd/mpd.conf" ] ; then
 
 elif [ -e "${HOME}/.mpdconf" ] ; then
 
-	# mpd管理下のディレクトリの抽出
 	music_dir=$(grep ^music_directory "${HOME}/.mpdconf" | cut -d"\"" -f2)
 
 elif [ -e "/etc/mpd.conf" ] ; then
@@ -17,7 +18,10 @@ elif [ -e "/etc/mpd.conf" ] ; then
 
 else
 
-	exit 1
+	# エラーメッセージをそれぞれ出力
+	notify-send "Error: mpd.conf not found" &
+
+	echo "Error: mpd.conf not found" 1>&2
 
 fi
 
@@ -31,3 +35,4 @@ song_path=$(dirname "${current_song}")
 img_dir="${music_dir}/${song_path}/Folder.jpg"
 
 notify-send "$(mpc status)" -i "${img_dir}" &
+
