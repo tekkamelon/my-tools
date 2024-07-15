@@ -20,6 +20,11 @@ elif type vim > /dev/null 2>&1 ; then
 	
 	export EDITOR=vim
 
+# viがあるか確認
+elif type vi > /dev/null 2>&1 ; then
+
+	export EDITOR=vi
+
 fi
 # ====== 変数の設定ここまで ======
 
