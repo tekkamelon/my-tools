@@ -6,8 +6,14 @@ string=$(cat - )
 # 第1引数を変数に代入
 args1="${1}"
 
+logfile="/tmp/tbug.log"
+
 # "/tmp/tbug.log"の有無を確認,無ければファイルを作成
-test -n /tmp/tbug.log || echo "" >| /tmp/tbug.log
+if [ -z "${logfile}" ] ; then
+
+	echo "" >| /tmp/tbug.log
+
+fi
 
 # 引数が"-q"ならば真,それ以外は偽
 if [ "${args1}" = "-q" ] ; then
