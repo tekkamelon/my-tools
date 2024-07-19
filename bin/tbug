@@ -6,12 +6,13 @@ string=$(cat - )
 # 第1引数を変数に代入
 args1="${1}"
 
+# ファイルのパス
 logfile="/tmp/tbug.log"
 
 # "/tmp/tbug.log"の有無を確認,無ければファイルを作成
 if [ -z "${logfile}" ] ; then
 
-	echo "" >| /tmp/tbug.log
+	echo "" >| "${logfile}"
 
 fi
 
@@ -19,12 +20,12 @@ fi
 if [ "${args1}" = "-q" ] ; then
 
 	# 真の場合はファイルに追記
-	echo "${string}" >> /tmp/tbug.log
+	echo "${string}" >> "${logfile}"
 
 else
 
 	# 偽の場合はteeでファイルに追記し出力
-	echo "${string}" | tee -a /tmp/tbug.log
+	echo "${string}" | tee -a "${logfile}"
 
 fi
 
