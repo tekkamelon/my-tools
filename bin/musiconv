@@ -4,6 +4,7 @@ args="${*}"
 
 if [ -n "${args}" ] ; then
 
+	# 拡張子をドット付き
 	input_format="${1}"
 	output_format="${2}"
 
@@ -15,7 +16,7 @@ if [ -n "${args}" ] ; then
 	# 論理プロセッサ数
 	core=$(grep -c "processor" /proc/cpuinfo)
 
-	echo "${filename}" | xargs -I{} -P"${core}" ffmpeg -i {}."${input_format}" {}."${output_format}"
+	echo "${filename}" | xargs -I{} -P"${core}" ffmpeg -i {}"${input_format}" {}"${output_format}"
 
 else
 
@@ -23,3 +24,4 @@ else
 	echo "Error: please enter args" > /dev/stderr
 
 fi
+
