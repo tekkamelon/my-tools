@@ -11,15 +11,14 @@ mkfifo /tmp/setup.fifo
 {
 
 	# git,wget,curlをインストール,成功時に名前付きパイプに書き込み
-	sudo apt install git wget -y && echo "" > /tmp/git.fifo
+	sudo apt install git wget -y && echo "" > /tmp/setup.fifo
 
 	# CLIツールのインストール
 	sudo apt install -y yash ksh mksh bash-completion mawk busybox w3m ranger imagemagick \
 
 		tig shellcheck mpd mpc neomutt barcode bc ed dc rename neofetch lame htop ncmpcpp info \
 
-		ncat nmap nc nfs-common pandoc ripgrep sc tree tmux qrencode lm-sensors fbterm curl apt-transport-https gnupg2
-
+		ncat nmap nc nfs-common pandoc ripgrep sc tree tmux qrencode lm-sensors fbterm curl apt-transport-https gnupg2 \
 
 	# braveのインストールの準備
 	sudo curl -fsSLo /usr/share/keyrings/brave-browser-archive-keyring.gpg https://brave-browser-apt-release.s3.brave.com/brave-browser-archive-keyring.gpg
@@ -39,8 +38,9 @@ mkfifo /tmp/setup.fifo
 	# GUIツールのインストール
 	sudo apt install -y i3 i3-wm suckless-tools stterm arandr feh i3-dmenu-desktop vlc menulibre \
 
-		brave-browser chromium-browser rofi codium
+		brave-browser chromium-browser rofi codium \
 
+		openscad meshlab cool-retro-term asunder easytag luakit steam thunar arandr vlc obs-studio
 
 } &
 
