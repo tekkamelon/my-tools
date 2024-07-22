@@ -1,5 +1,6 @@
 #!/bin/sh 
 # pop-osのリフレッシュインストール後のセットアップ用
+# 使用前に各ブラウザのブックマークをバックアップ
 
 set -eu
 
@@ -13,7 +14,7 @@ tig shellcheck mpd mpc neomutt barcode bc ed dc rename neofetch lame htop ncmpcp
 
 ncat nmap nc nfs-common pandoc ripgrep sc tree tmux qrencode lm-sensors fbterm curl apt-transport-https gnupg2 fonts-vlgothic \
 
-pkg-config libfreetype6-dev libfontconfig1-dev libxcb-xfixes0-dev python3
+pkg-config libfreetype6-dev libfontconfig1-dev libxcb-xfixes0-dev python3 docker
 
 # rustとcargoをインストール
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
@@ -28,7 +29,6 @@ echo 'deb https://download.opensuse.org/repositories/home:/losuler:/icecat/Debia
 curl -fsSL https://download.opensuse.org/repositories/home:losuler:icecat/Debian_11/Release.key | gpg --dearmor | sudo tee /etc/apt/trusted.gpg.d/home_losuler_icecat.gpg > /dev/null
 
 
-cd "${HOME}"
 
 # GUIツールのインストール
 sudo apt install -y xfce4 i3 i3-wm suckless-tools stterm arandr feh i3-dmenu-desktop vlc menulibre xfce4-popup-whiskermenu \
@@ -43,6 +43,9 @@ cd "${HOME}"/Downloads
 wget -O code.deb "https://code.visualstudio.com/sha/download?build=stable&os=linux-deb-x64"
 
 sudo dpkg -i code.deb
+
+cd "${HOME}"
+
 # fusion360のインストール
 mkdir -p "$HOME/.fusion360/bin" && cd "$HOME/.fusion360/bin" && wget -N https://raw.githubusercontent.com/cryinkfly/Autodesk-Fusion-360-for-Linux/main/files/builds/stable-branch/bin/install.sh && chmod +x install.sh && ./install.sh
 
