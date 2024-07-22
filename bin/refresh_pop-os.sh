@@ -23,13 +23,26 @@ sudo curl -fsSLo /usr/share/keyrings/brave-browser-archive-keyring.gpg https://b
 
 echo "deb [signed-by=/usr/share/keyrings/brave-browser-archive-keyring.gpg] https://brave-browser-apt-release.s3.brave.com/ stable main" | sudo tee /etc/apt/sources.list.d/brave-browser-release.list
 
+# icecatのインストールの準備
+echo 'deb https://download.opensuse.org/repositories/home:/losuler:/icecat/Debian_11/ /' | sudo tee /etc/apt/sources.list.d/home:losuler:icecat.list
+curl -fsSL https://download.opensuse.org/repositories/home:losuler:icecat/Debian_11/Release.key | gpg --dearmor | sudo tee /etc/apt/trusted.gpg.d/home_losuler_icecat.gpg > /dev/null
+
+
+cd "${HOME}"
+
 # GUIツールのインストール
 sudo apt install -y xfce4 i3 i3-wm suckless-tools stterm arandr feh i3-dmenu-desktop vlc menulibre xfce4-popup-whiskermenu \
 
-brave-browser chromium-browser rofi \
+brave-browser chromium-browser icecat rofi \
 
 openscad meshlab cool-retro-term asunder easytag luakit steam thunar arandr obs-studio stterm
 
+# vscodeのインストール
+cd "${HOME}"/Downloads
+
+wget -O code.deb "https://code.visualstudio.com/sha/download?build=stable&os=linux-deb-x64"
+
+sudo dpkg -i code.deb
 # fusion360のインストール
 mkdir -p "$HOME/.fusion360/bin" && cd "$HOME/.fusion360/bin" && wget -N https://raw.githubusercontent.com/cryinkfly/Autodesk-Fusion-360-for-Linux/main/files/builds/stable-branch/bin/install.sh && chmod +x install.sh && ./install.sh
 
