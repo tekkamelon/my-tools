@@ -1,0 +1,8 @@
+#!/bin/sh
+
+set -u
+
+cura_path=$(find "${HOME}"/Applications/ -name '*-Cura-*' | awk 'END{print}')
+
+exec "${cura_path}" "${@}"
+
