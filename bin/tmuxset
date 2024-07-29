@@ -1,5 +1,7 @@
 #!/bin/sh
 
+set -u
+
 # ====== 変数の設定 ======
 # セッション一覧を変数に代入
 tmux_list=$(tmux ls)
@@ -13,7 +15,7 @@ edit_settion_check=$(
 	awk -F[:" "] '
 
 	# "edit"セッションにアタッチしていなければ出力
-	$1 == "edit" && $NF != "(attached)"{
+	$NF != "(attached)" && $1 == "edit"{
 
 		print $1
 
@@ -31,7 +33,7 @@ git_settion_check=$(
 	awk -F[:" "] '
 
 	# "git"セッションにアタッチしていなければ出力
-	$1 == "git" && $NF != "(attached)"{
+	$NF != "(attached)" && $1 == "git"{
 
 		print $1
 
@@ -39,12 +41,11 @@ git_settion_check=$(
 	'
 
 )
-
 # ====== 変数の設定ここまで ======
 
 
 # tmuxが起動,かつeditセッションにアタッチしていなければ真
-if [ -n "${tmux_list}" ] && [  -n "${edit_settion_check}" ] ; then
+if [ -n "${edit_settion_check}" ] ; then
 
 	tmux a -t "${edit_settion_check}"
 
