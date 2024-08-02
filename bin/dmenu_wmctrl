@@ -1,5 +1,7 @@
 #!/bin/sh
 
+set -e
+
 # 環境変数の設定
 export LC_ALL=C
 export LANG=C
@@ -20,8 +22,7 @@ else
 
 fi
 
-# 以降,変数が空の場合に実行を中止
-set -eu
+set -u
 
 # wmctrlがシステム内に存在するかを確認,あれば真,なければ偽
 if type wmctrl > /dev/null 2>&1 ; then
@@ -34,8 +35,8 @@ if type wmctrl > /dev/null 2>&1 ; then
 
 else
 
-	# 偽の場合はエラーメッセージを表示,dmneuからの出力を捨てる
-	echo "please install \"wmctrl\"!" | dmenu -p "error!" > /dev/null
+	# 偽の場合はエラーメッセージを表示,dmenuからの出力を捨てる
+	echo "Error: please install \"wmctrl\"" | dmenu -p "dmenu_wmctrl" > /dev/null
 
 fi 
 
