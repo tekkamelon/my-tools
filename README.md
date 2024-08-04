@@ -161,3 +161,35 @@
 
 - ヘッダから引数にマッチする列を抽出
 
+## musiconv
+
+- 複数の音声ファイルを一括変換
+
+## xc2c
+
+- Excel専用のcsvを通常のcsvに変換
+
+## comlaunch
+
+- fzfを使用したコマンドランチャー
+
+## chitubox
+
+- chituboxを起動するラッパー
+
+## chromium-browser
+
+- ungoogled-chromiumを起動するラッパー
+
+## cura
+
+- curaを起動するラッパー
+
+## genymotion
+
+- genymotionを起動するラッパー
+
+## nvim
+
+- neovimを起動するラッパー
+
