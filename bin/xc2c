@@ -1,0 +1,88 @@
+#!/bin/sh -eu
+
+# ====== 変数の設定 ======
+# ロケールの設定
+export LC_ALL=C
+export LANG=C
+
+# GNU coreutilsの挙動をPOSIXに準拠
+export POSIXLY_CORRECT=1
+# ====== 変数の設定ここまで ======
+
+
+# パーサー本体
+parser () {
+
+	cat - |
+
+	# Shift-JISからUTF-8に変換
+	iconv -f sjis -t utf8 |
+
+	awk '
+
+	BEGIN{
+
+		# 区切り文字をカンマに指定
+		FS = ","
+		OFS = ","
+
+	}
+
+	{
+
+		# 不要なフィールドを除外
+		NF = NF-1
+
+		# 1行目以外で真
+		if(NR != 1){
+
+			# 改行コードをCRLFからLFへ置換
+			gsub("\r" , "")
+
+			# ダブルクォートと"="の削除
+			gsub("\"=\"" , "")
+			gsub("\"" , "")
+
+			# 行末のカンマを削除
+			sub(/\,$/ , "")
+
+			print $0
+
+		}
+
+	}
+	' |
+
+	# 空行を削除
+	sed '/^$/d'
+
+}
+
+# 標準入力と引数の両方があれば真,無ければ偽
+if [ -p /dev/stdin ] && [ "${#}" != 0 ] ; then
+
+	# 第1引数を変数に代入
+	args="${1}"
+
+    cat - "${args}" | parser
+  
+# 真の場合は標準出力があれば真
+elif [ -p /dev/stdin ] ; then
+
+    cat - | parser
+
+# 偽の場合は引数の数を確認,0以外で真
+elif [ "${#}" != 0 ] ; then
+
+	# 第1引数を変数に代入
+	args="${1}"
+
+	cat < "${args}" | parser
+
+else
+
+	# 偽の場合はメッセージを標準エラー出力に表示
+	echo "please stdin!" 1>&2
+
+fi
+
