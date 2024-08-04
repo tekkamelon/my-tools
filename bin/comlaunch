@@ -7,10 +7,12 @@ export LC_ALL=C
 export LANG=C
 
 export POSIXLY_CORRECT=1
+
+host=$(hostname)
 # ====== 変数の設定ここまで ======
 
 
 echo "${PATH}" | tr ":" "\n" | xargs ls 2> /dev/null | awk '!a[$0]++' |
 
-fzf --reverse --prompt="${USERNAME} > " | sh 2> /dev/null
+fzf --reverse --prompt="${host} > " | sh 2> /dev/null
 
