@@ -1,37 +1,50 @@
 #!/bin/sh
 
-set -e
+set -u
 
-# 環境変数の設定
+# ====== 変数の設定 ======
 export LC_ALL=C
 export LANG=C
 
-# 引数をargsに代入
-args="${*}"
+export POSIXLY_CORRECT=1
 
-# argsの有無を判定,引数があれば真,なければ偽
-if [ -n "${args}" ] ; then
+# 引数の有無を判定,引数があれば真,なければ偽
+if [ -n "${*}" ] ; then
 
 	# 真の場合は引数をdmenuに渡す
-	dmenu_custom="dmenu ${args}"
+	dmenu_custom="dmenu ${*}"
 
 else
 
 	# 偽の場合は予め設定された引数をdmenuに渡す
-	dmenu_custom='dmenu -p dmenu_wmctrl -i -l 20 -sb black -sf grey -fn monospace'
+	dmenu_custom="dmenu -p ${USER} -i -l 20 -sb black -sf grey -fn monospace"
 
 fi
+# ====== 変数の設定ここまで ======
 
-set -u
+
+set -e
 
 # wmctrlがシステム内に存在するかを確認,あれば真,なければ偽
 if type wmctrl > /dev/null 2>&1 ; then
 
-	# ウィンドウ一覧を"wmctrl"で出力,選択されたウィンドウを変数に代入
-	selected_window=$(wmctrl -l | cut -d" " -f5- | ${dmenu_custom})
+	wmctrl -l | 
 
-	# 選択されたウィンドウに切り替え
-	wmctrl -a "${selected_window}"
+	# 区切り文字をスペースに指定,4フィールド以降を抽出
+	awk -F" " '
+
+	{
+
+		for(i = 4; i < NF; ++i){
+
+			printf("%s ", $i)
+
+		}
+
+		print $NF
+		
+	}
+	'| ${dmenu_custom} | xargs wmctrl -a
 
 else
 
