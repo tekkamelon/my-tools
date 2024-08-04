@@ -1,27 +1,29 @@
 #!/bin/sh
 
-# 環境変数の設定
+set -u
+
+# ====== 変数の設定 ======
 export LC_ALL=C
 export LANG=C
 
-# 引数をargsに代入
-args="${*}"
+export POSIXLY_CORRECT=1
 
-# argsの有無を判定,引数があれば真,なければ偽
-if [ -n "${args}" ] ; then
+# 引数の有無を判定,引数があれば真,なければ偽
+if [ -n "${*}" ] ; then
 
 	# 真の場合は引数をdmenuに渡す
-	dmenu_custom="${args}"
+	dmenu_custom="${*}"
 
 else
 
 	# 偽の場合は予め設定された引数をdmenuに渡す
-	dmenu_custom=' -p "dmenu_desktop" -i -l 20 -sb "black" -sf "grey" -fn "monospace"'
+	dmenu_custom=" -p ${USER} -i -l 20 -sb black -sf grey -fn monospace"
 
 fi
+# ====== 変数の設定ここまで ======
 
-# 以降,変数が空の場合に実行を中止
-set -eu
+
+set -e
 
 # j4-dmenu-desktopがシステム内に存在するかを確認
 if type j4-dmenu-desktop > /dev/null 2>&1 ; then
