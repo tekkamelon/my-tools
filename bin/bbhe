@@ -6,10 +6,12 @@ string=$(cat - )
 # 第1引数を変数に代入
 args="${1}"
 
-
 # 引数が"-a"の場合は真,それ以外で偽
 if [ "${args}" = "-a" ] ; then
 	
+	# 以降,変数が空の場合に実行を中止
+	set -eu
+
 	# 真の場合,末尾に改行を付けずに出力
 	echo "${string}" | xargs busybox httpd -e
 
