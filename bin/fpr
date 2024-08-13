@@ -1,12 +1,25 @@
 #!/bin/sh
 
+set -eu
+
+# ====== 環境変数の設定 ======
+# ロケールの設定
+export LC_ALL=C
+export LANG=C
+
+# GNU coreutilsの挙動をPOSIXに準拠
+export POSIXLY_CORRECT=1
+# ====== 環境変数の設定ここまで ======
+
+
 # 置換前
-pattern="$1"
+pattern="${1}"
 
 # 置換後
-replace="$2"
+replace="${2}"
 
 # 置換対象のファイル
-input_file="$3"
+input_file="${3}"
 
-printf "%%s/$pattern/$replace/g\nw\n" | ed - "${input_file}"
+printf "%%s/${pattern}/${replace}/g\nw\n" | ed - "${input_file}"
+
