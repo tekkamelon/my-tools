@@ -20,14 +20,14 @@ if [ "${#}" = 4 ] || [ "${#}" = 5 ]; then
 		ping "${ip_adress}" -c 3 &&
 
 		# 真の場合はcurlでdiscordのwebhookにメッセージをPOST
-		curl -X POST  "${webhook_url}" -H "Content-Type: application/json" -d @- <<EOS
-{
+		curl -X POST  "${webhook_url}" -H "Content-Type: application/json" -d @- <<-EOS
+			{
 
-	"username": "${bot_name}",
-	"content": "${message}"
+				"username": "${bot_name}",
+				"content": "${message}"
 
-}
-EOS
+			}
+			EOS
 	
 	elif [ "${switch}" = "-f" ] ; then
 
@@ -35,14 +35,14 @@ EOS
 		ping "${ip_adress}" -c 3 ||
 
 		# curlでdiscordのwebhookにメッセージをPOST
-		curl -X POST  "${webhook_url}" -H "Content-Type: application/json" -d @- <<EOS
-{
+		curl -X POST  "${webhook_url}" -H "Content-Type: application/json" -d @- <<-EOS
+			{
 
-	"username": "${bot_name}",
-	"content": "${message}"
+				"username": "${bot_name}",
+				"content": "${message}"
 
-}
-EOS
+			}
+			EOS
 	
 	fi
 
@@ -53,3 +53,4 @@ else
 	echo "$0 ip_adress webhook_url bot_name message" 1>&2
 
 fi
+
