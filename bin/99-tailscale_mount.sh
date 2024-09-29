@@ -1,5 +1,8 @@
 #!/bin/sh 
 
+# このスクリプトを"/etc/NetworkManager/dispatcher.d/"
+# hogeを適宜除外するAP名に設定
+
 set -eu
 
 # 除外するAP
