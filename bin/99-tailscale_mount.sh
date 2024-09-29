@@ -1,6 +1,6 @@
 #!/bin/sh 
 
-# このスクリプトを"/etc/NetworkManager/dispatcher.d/"
+# このスクリプトを"/etc/NetworkManager/dispatcher.d/"以下のディレクトリに配置
 # hogeを適宜除外するAP名に設定
 
 set -eu
@@ -11,7 +11,7 @@ ignore_ap=hoge
 # 接続先のAP
 ap_name=$(
 
-iwconfig 2> /dev/null |
+	iwconfig 2> /dev/null |
 
 	# 区切り文字を":"とスペースに指定
 	awk -F[:" "] '
@@ -19,8 +19,8 @@ iwconfig 2> /dev/null |
 	# 1行目のみを処理
 	NR == 1{
 
-		# 5フィールド目が"IEEE"かつ9フィールド目が"off/any"ではない場合に真
-		if($5 == "IEEE" && $9 != "off/any"){
+		# 6フィールド目が"802.11"かつ9フィールド目が"off/any"ではない場合に真
+		if($6 == "802.11" && $9 != "off/any"){
 
 			print "<" $9 ">"
 
