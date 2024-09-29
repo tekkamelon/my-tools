@@ -41,5 +41,10 @@ if [ "${2}" = "up" ] && echo "${ap_name}" | grep -q ^${ignore_ap} ; then
 
 	systemctl restart rc-local.service
 
+# wi-fiが接続されかつAP名が"ignore_ap"であれば真
+elif [ "${2}" = "up" ] && echo "${ap_name}" | grep -v -q ^${ignore_ap} ; then
+
+	tailscale down
+
 fi
 
