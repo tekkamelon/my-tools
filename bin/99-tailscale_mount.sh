@@ -6,7 +6,7 @@
 set -eu
 
 # 除外するAP
-ignore_ap=hoge
+home_ap=hoge
 
 # 接続先のAP
 ap_name=$(
@@ -22,11 +22,12 @@ ap_name=$(
 		# 6フィールド目が"802.11"かつ9フィールド目が"off/any"ではない場合に真
 		if($6 == "802.11" && $9 != "off/any"){
 
-			print "<" $9 ">"
+			# AP名を出力
+			print $9
 
 		}else{
 
-			print "<no " "wireless>"
+			print "no_wireless"
 
 		}
 
@@ -34,17 +35,17 @@ ap_name=$(
 	'
 )
 
-# wi-fiが接続されかつAP名が"ignore_ap"以外であれば真
-if [ "${2}" = "up" ] && echo "${ap_name}" | grep -F -v -q "${ignore_ap}" ; then
+# wi-fiに接続されていないか"home_ap"に接続されている場合に真
+if [ "${ap_name}" = "no_wireless" ] || echo "${ap_name}" | grep -F -q "${home_ap}" ; then
+
+	tailscale down
+
+# "home_ap"以外のwi-fiに接続されている場合に真
+elif echo "${ap_name}" | grep -F -v -q "${home_ap}" ; then
 
 	tailscale up &&
 
 	systemctl restart rc-local.service
-
-# wi-fiが接続されかつAP名が"ignore_ap"であれば真
-elif [ "${2}" = "up" ] && echo "${ap_name}" | grep -F -q "${ignore_ap}" ; then
-
-	tailscale down
 
 fi
 
