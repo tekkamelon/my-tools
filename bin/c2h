@@ -1,5 +1,6 @@
 #!/bin/awk -f
 
+# 引数として"-v header="を受取可能
 BEGIN{
 
 	# 区切り文字の処理
@@ -17,8 +18,14 @@ BEGIN{
 	OFS = "</td><td>"
 
 	# ヘッダの出力
-	print "<DOCTYPE html>"
-	print "<html>"
+	# "header"変数が"no"であれば出力しない
+	if(header != "no"){
+
+		print "<DOCTYPE html>"
+		print "<html>"
+
+	}
+	
 	print "<table border=\"1\">"
 
 }
@@ -35,11 +42,16 @@ BEGIN{
 
 }
 
-# ファイルの末尾に追記
 END{
 
 	print "</table>"
-	print "</html>"
+
+	# "header"変数が"no"であれば出力しない
+	if(header != "no"){
+
+		print "</html>"
+
+	}
 
 }
 
