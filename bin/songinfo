@@ -29,7 +29,7 @@ fi
 current_song=$(mpc current -f "%file%")
 
 # ディレクトリのみ抽出
-song_path=$(dirname "${current_song}")
+song_path="${current_song%/*}"
 
 # カバーアートまでの絶対パス
 img_dir="${music_dir}/${song_path}/Folder.jpg"
