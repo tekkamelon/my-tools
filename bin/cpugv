@@ -1,3 +1,15 @@
-#/bin/sh
+#!/bin/sh
 
-sudo cpufreq-set -g $1
+# 引数があれば真
+if [ -n "${1}" ] ; then
+
+	# 全てのコアのガバナーを変更
+	sudo cpufreq-set -r -g "${1}"
+
+else
+
+	# 引数がない場合は現在の各CPUガバナーの状態を取得
+	cat /sys/devices/system/cpu/cpu*/cpufreq/scaling_governor
+
+fi
+
