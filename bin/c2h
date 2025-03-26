@@ -21,12 +21,25 @@ BEGIN{
 	# "header"変数が"no"であれば出力しない
 	if(header != "no"){
 
-		print "<DOCTYPE html>"
+		print "<!DOCTYPE html>"
 		print "<html>"
+		print "<head><meta charset=\"UTF-8\"></head>"
+		print "<body>"
 
 	}
 	
 	print "<table border=\"1\">"
+
+}
+
+# 特殊文字のエスケープ処理
+function escape(str) {
+
+    gsub(/&/, "\\&amp;", str)
+    gsub(/</, "\\&lt;", str)
+    gsub(/>/, "\\&gt;", str)
+
+    return str
 
 }
 
@@ -37,7 +50,7 @@ BEGIN{
 
 	# 行頭,行末にタグの追記
 	print "<tr>"
-	print "<td>"$0"</td>"
+	print "<td>"escape($0)"</td>"
 	print "</tr>"
 
 }
@@ -49,6 +62,7 @@ END{
 	# "header"変数が"no"であれば出力しない
 	if(header != "no"){
 
+		print "</body>"
 		print "</html>"
 
 	}
