@@ -10,7 +10,15 @@ session_name="minecraft"
 ram_size="12G"
 
 # セッションをデタッチ状態で起動,既にセッションがあれば何もしない
-tmux new-session -A -d -s "${session_name}"
+if tmux has-session -t "${session_name}" 2>/dev/null ; then
+
+	echo "セッション ${session_name} は既に存在します"
+
+else
+
+	tmux new-session -d -s "${session_name}"
+
+fi
 
 # マイクラサーバーが起動していれば真
 if pgrep -f "java.*server.jar" > /dev/null; then
