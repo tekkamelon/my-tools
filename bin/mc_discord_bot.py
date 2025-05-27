@@ -21,11 +21,13 @@ async def on_ready():
 # コマンドの定義
 # !startmc コマンドでサーバーを起動するシェルスクリプトを起動
 @bot.command(name='startmc')
-@commands.has_role('Server Admin')
+# サーバーの全員に許可
+@commands.has_role('@everyone')
 async def start_mc(ctx):
     try:
         subprocess.run(
-            ['bash', '/home/tekkamelon/github/tmux_mc.sh'],
+            # サーバー起動用のbash
+            ['bash', '/home/tekkamelon/Documents/github/bin/tmux_mc.sh'],
             check=True
         )
         await ctx.send('マインクラフトサーバーを起動しました！')
