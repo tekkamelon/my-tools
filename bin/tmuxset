@@ -68,24 +68,15 @@ else
 	tmux new-session -d -s command 
 	tmux new-session -d ;
 
-	# グループ化し並列に処理
-	{ 
+	# 新規ウィンドウを作成
+	tmux new-window -t git 
+	tmux new-window -t music
 
-		# 新規ウィンドウを作成
-		tmux new-window -t git &
-		tmux new-window -t music &
-
-	}
-
-	{ 
-
-		# ペインを分割
-		tmux split-window -v -t git &
-		tmux split-window -v -t docker &
-		tmux split-window -v -t music &
-		tmux split-window -v -t network ;
-
-	}
+	# ペインを分割
+	tmux split-window -v -t git
+	tmux split-window -v -t docker
+	tmux split-window -v -t music
+	tmux split-window -v -t network
 
 	# "edit"セッションにアタッチ
 	tmux a -t edit
