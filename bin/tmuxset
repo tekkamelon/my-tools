@@ -6,51 +6,40 @@ set -u
 # セッション一覧を変数に代入
 tmux_list=$(tmux ls)
 
-# "edit"セッションにアタッチされているか確認
-edit_settion_check=$(
+# セッションにアタッチされているか確認する関数
+settion_check() {
+
+	# セッション名を変数に代入
+	settion_name="${1}"
 
 	echo "${tmux_list}" |
 
-	# 区切り文字を":"とスペースに指定
-	awk -F[:" "] '
+	# 区切り文字を":"とスペースに指定,シェル変数をawk変数にに渡す
+	awk -F[:" "] -v settion_name="${settion_name}" '
 
-	# "edit"セッションにアタッチしていなければ出力
-	$NF != "(attached)" && $1 == "edit"{
+	# 変数"settion_name"セッションにアタッチしていなければ出力
+	$NF != "(attached)" && $1 == settion_name{
 
 		print $1
 
 	}
 	'
 
-)
+}
 
-# "git"セッションにアタッチされているか確認
-git_settion_check=$(
-
-	echo "${tmux_list}" |
-
-	# 区切り文字を":"とスペースに指定
-	awk -F[:" "] '
-
-	# "git"セッションにアタッチしていなければ出力
-	$NF != "(attached)" && $1 == "git"{
-
-		print $1
-
-	}
-	'
-
-)
+# セッションにアタッチされているか確認
+edit_settion_check=$(settion_check "edit")
+git_settion_check=$(settion_check "git")
 # ====== 変数の設定ここまで ======
 
 
 # tmuxが起動,かつeditセッションにアタッチしていなければ真
-if [ -n "${edit_settion_check}" ] ; then
+if [ -n "${edit_settion_check}" ]; then
 
 	tmux a -t "${edit_settion_check}"
 
 # tmuxが起動していれば真
-elif [ -n "${tmux_list}" ] ; then
+elif [ -n "${tmux_list}" ]; then
 
 	tmux a -t "${git_settion_check}"
 
