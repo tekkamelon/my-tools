@@ -59,13 +59,19 @@ else
 	# ホームディレクトリに戻る
 	cd "${HOME}" || exit
 
-	# 新規セッションを作成,即デタッチ
-	tmux new-session -d -s edit
-	tmux new-session -d -s git 
-	tmux new-session -d -s docker
-	tmux new-session -d -s music
-	tmux new-session -d -s network
-	tmux new-session -d -s command 
+	# 作成するセッション名を定義
+	sessions="edit git docker music network command"
+
+	# tmuxサーバーを起動
+	tmux start-server
+
+	# ループで各セッションを作成
+	for session in ${sessions}; do
+
+	    tmux new-session -d -s "${session}"
+
+	done
+
 	tmux new-session -d ;
 
 	# 新規ウィンドウを作成
