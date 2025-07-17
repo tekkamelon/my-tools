@@ -2,40 +2,27 @@
 
 # shellcheck disable=SC1112
 
-# 標準入力と引数の両方があれば真,無ければ偽
-if [ -p /dev/stdin ] && [ "${#}" != 0 ] ; then
+# 標準入力がある場合
+if [ -p /dev/stdin ]; then
 
-	# 第1引数を変数に代入
-	args="${1}"
+    sed 'y/ＡＢＣＤＥＦＧＨＩＪＫＬＭＮＯＰＱＲＳＴＵＶＷＸＹＺａｂｃｄｅｆｇｈｉｊｋｌｍｎｏｐｑｒｓｔｕｖｗｘｙｚ０１２３４５６７８９/ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789/; y/　／（）’”！？/ \/\(\)'\''"\!\?/' /dev/stdin
 
-    cat - "${args}" |
+# 引数がある場合
+elif [ "${#}" -gt 0 ]; then
 
-	# 全角英数,スペース,スラッシュ,その他記号をを半角に置換
-	sed -e 'y/ＡＢＣＤＥＦＧＨＩＪＫＬＭＮＯＰＱＲＳＴＵＶＷＸＹＺａｂｃｄｅｆｇｈｉｊｋｌｍｎｏｐｑｒｓｔｕｖｗｘｙｚ０１２３４５６７８９/ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789/' -e 'y/　／（）’”！？/ \/\(\)'\''"\!\?/'
+    file="${1}"
+    tmpfile="$(mktemp)"
 
-# 真の場合は標準出力があれば真
-elif [ -p /dev/stdin ] ; then
+    # 一時ファイルに書き込み
+    sed 'y/ＡＢＣＤＥＦＧＨＩＪＫＬＭＮＯＰＱＲＳＴＵＶＷＸＹＺａｂｃｄｅｆｇｈｉｊｋｌｍｎｏｐｑｒｓｔｕｖｗｘｙｚ０１２３４５６７８９/ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789/; y/　／（）’”！？/ \/\(\)'\''"\!\?/' "${file}" > "${tmpfile}"
 
-    cat - |
-
-	# 全角英数,スペース,スラッシュ,その他記号をを半角に置換
-	sed -e 'y/ＡＢＣＤＥＦＧＨＩＪＫＬＭＮＯＰＱＲＳＴＵＶＷＸＹＺａｂｃｄｅｆｇｈｉｊｋｌｍｎｏｐｑｒｓｔｕｖｗｘｙｚ０１２３４５６７８９/ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789/' -e 'y/　／（）’”！？/ \/\(\)'\''"\!\?/'
-
-# 偽の場合は引数の数を確認,0以外で真
-elif [ "${#}" != 0 ] ; then
-    
-	args="${1}"
-
-    # 全角英数,スペース,その他記号をを半角に置換し上書き保存
-	sed -i -e 'y/ＡＢＣＤＥＦＧＨＩＪＫＬＭＮＯＰＱＲＳＴＵＶＷＸＹＺａｂｃｄｅｆｇｈｉｊｋｌｍｎｏｐｑｒｓｔｕｖｗｘｙｚ０１２３４５６７８９/ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789/' -e 'y/　／（）’”！？/ \/\(\)'\''"\!\?/' "${args}"
-
-	# 保存したファイルを出力
-	cat "${args}"
+	# 一時ファイルを元のファイルに上書き
+    mv "${tmpfile}" "${file}"
 
 else
 
-	# 偽の場合はメッセージを標準エラー出力に表示
-	echo "please stdin or argment!" 1>&2
+    echo "Error: Please provide either stdin or a file argument." >&2
+    exit 1
 
 fi
 
