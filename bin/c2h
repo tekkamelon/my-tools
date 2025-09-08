@@ -28,8 +28,8 @@ BEGIN{
 function escape(str) {
 
     gsub(/&/, "\\&amp;", str)
-    gsub(/</, "\\&lt;", str)
-    gsub(/>/, "\\&gt;", str)
+	gsub(/"/, "\\&quot;", str)
+	gsub(/'/, "\\&#39;", str)
 
     return str
 
