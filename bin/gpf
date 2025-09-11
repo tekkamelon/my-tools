@@ -8,10 +8,26 @@ if ! command -v gemini > /dev/null; then
 	# ヒアドキュメントでエラーメッセージを表示
 	cat <<- EOS >&2
     gemini is not installed or not in PATH.
+	Please install gemini and try again.
 	$ npx https://github.com/google-gemini/gemini-cli
 	or
 	$ npm install -g @google/gemini-cli
 	EOS
+
+	exit 1
+
+fi
+
+# fzfの有無を確認
+if ! command -v fzf > /dev/null; then
+
+	cat <<- EOS >&2
+	fzf is not installed or not in PATH.
+	Please install fzf and try again.
+	$ sudo apt install fzf
+	EOS
+
+	exit 1
 
 fi
 
@@ -44,6 +60,6 @@ case "${selected}" in
 
 esac
 
-# gemini-cliに処理を委譲
+# gemini-cliに処理を依頼,非対話モードかつ自律モードを有効化
 gemini --yolo -p "${message}"
 
