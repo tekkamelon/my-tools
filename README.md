@@ -193,3 +193,7 @@
 
 - neovimを起動するラッパー
 
+## gpf
+
+- fzfとgemini-cliを連携させ、定型的なgit操作やREADMEの編集作業を支援
+
