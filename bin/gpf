@@ -1,38 +1,36 @@
-#!/bin/sh 
+#!/bin/sh
 
 set -eu
 
-# fzfで選択するメニュー項目をヒアドキュメントで定義
-cat <<- EOS |
+# メニュー項目の定義
+menu_items=$(cat <<- EOS
 1:git commitの作成
 2:READMEへの反映
 3:READMEを添削
 EOS
+)
 
-# fzfでインタラクティブに項目選択(逆順表示)
-fzf --reverse |
+# 選択処理
+selected=$(echo "$menu_items" | fzf --reverse --prompt="操作を選択 > " | cut -d":" -f1)
 
-# awkで選択された項目番号に基づいて処理を分岐
-awk -F":" '
-{
-    # 1が選択された場合: gitコミット作成指示
-    if($1 == 1){
+# 選択処理で受け取った変数に応じプロンプトを変数に代入
+case "${selected}" in
 
-        print "gitから変更点を確認し適切なコミットを作成してください.コミットの作成時に許可を得る必要はありません"
-    
-    # 2が選択された場合: README更新指示
-    }else if($1 == 2){
+    1)
+        message="gitから変更点を確認し適切なコミットを作成してください。コミットの作成時に許可を得る必要はありません"
+        ;;
+    2)
+        message="gitから変更点を確認し必要であればREADME.mdに追記してください"
+        ;;
+    3)
+        message="README.mdの内容を添削し変更点を別ファイルに書き出してください"
+        ;;
+    *)
+        exit 1
+        ;;
 
-        print "gitから変更点を確認し必要であれば@README.mdに追記してください"
-    
-    # 3が選択された場合: README添削指示
-    }else if($1 == 3){
+esac
 
-        print "@README.mdの内容を添削し変更点を別ファイルに書き出してください"
-    }
-}
-' |
-
-# gemini-cliに処理を委譲(--yoloオプション付き)
-xargs -I{} gemini --yolo -p {}
+# gemini-cliに処理を委譲
+gemini --yolo -p "${message}"
 
