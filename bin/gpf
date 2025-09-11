@@ -2,6 +2,19 @@
 
 set -eu
 
+# gemini-cliの有無を確認
+if ! command -v gemini > /dev/null; then
+
+	# ヒアドキュメントでエラーメッセージを表示
+	cat <<- EOS >&2
+    gemini is not installed or not in PATH.
+	$ npx https://github.com/google-gemini/gemini-cli
+	or
+	$ npm install -g @google/gemini-cli
+	EOS
+
+fi
+
 # メニュー項目の定義
 menu_items=$(cat <<- EOS
 1:git commitの作成
@@ -11,7 +24,7 @@ EOS
 )
 
 # 選択処理
-selected=$(echo "$menu_items" | fzf --reverse --prompt="操作を選択 > " | cut -d":" -f1)
+selected=$(echo "${menu_items}" | fzf --reverse --prompt="操作を選択 > " | cut -d":" -f1)
 
 # 選択処理で受け取った変数に応じプロンプトを変数に代入
 case "${selected}" in
