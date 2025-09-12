@@ -2,26 +2,39 @@
 
 set -eu
 
-# mpdの設定ファイルの有無を確認
-if [ -e "${HOME}/.config/mpd/mpd.conf" ] ; then
+# MPD設定ファイルからmusic_directoryを取得
+get_music_dir(){
 
-	# mpd管理下のディレクトリの抽出
-	music_dir=$(grep ^music_directory "${HOME}"/.config/mpd/mpd.conf | cut -d"\"" -f2)
+    if [ -e "${HOME}/.config/mpd/mpd.conf" ]; then
 
-elif [ -e "${HOME}/.mpdconf" ] ; then
+        grep ^music_directory "${HOME}/.config/mpd/mpd.conf" | cut -d'"' -f2
 
-	music_dir=$(grep ^music_directory "${HOME}/.mpdconf" | cut -d"\"" -f2)
+    elif [ -e "${HOME}/.mpdconf" ]; then
 
-elif [ -e "/etc/mpd.conf" ] ; then
+        grep ^music_directory "${HOME}/.mpdconf" | cut -d'"' -f2
 
-	music_dir=$(grep ^music_directory "/etc/mpd.conf" | cut -d"\"" -f2)
+    elif [ -e "/etc/mpd.conf" ]; then
 
-else
+        grep ^music_directory "/etc/mpd.conf" | cut -d'"' -f2
 
-	# エラーメッセージをそれぞれ出力
-	notify-send "Error: mpd.conf not found" &
+    else
 
-	echo "Error: mpd.conf not found" 1>&2
+        echo ""
+
+    fi
+
+}
+
+music_dir=$(get_music_dir)
+
+# music_directoryが見つからない場合のエラー処理
+if [ -z "${music_dir}" ]; then
+
+	# エラーメッセージを通知
+    notify-send "Error: mpd.conf not found or music_directory not set" &
+    echo "Error: mpd.conf not found or music_directory not set" >&2
+
+    exit 1
 
 fi
 
