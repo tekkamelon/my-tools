@@ -39,13 +39,30 @@ if [ -z "${music_dir}" ]; then
 fi
 
 # 再生中の曲の相対パスを抽出
-current_song=$(mpc current -f "%file%")
+current_song=$(mpc current -f "%file%" 2>/dev/null)
+
+# current_songが空の場合のエラー処理
+if [ -z "${current_song}" ]; then
+
+    notify-send "Error: No song is currently playing" &
+    echo "Error: No song is currently playing" >&2
+
+    exit 1
+
+fi
 
 # ディレクトリのみ抽出
 song_path="${current_song%/*}"
 
 # カバーアートまでの絶対パス
 img_dir="${music_dir}/${song_path}/Folder.jpg"
+
+# カバーアートファイルの存在確認
+if [ ! -f "$img_dir" ]; then
+
+    img_dir=""
+
+fi
 
 notify-send "$(mpc status)" -i "${img_dir}" &
 
