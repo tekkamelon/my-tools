@@ -7,18 +7,18 @@ set -u
 tmux_list=$(tmux ls)
 
 # セッションにアタッチされているか確認する関数
-settion_check() {
+session_check() {
 
 	# セッション名を変数に代入
-	settion_name="${1}"
+	session_name="${1}"
 
 	echo "${tmux_list}" |
 
 	# 区切り文字を":"とスペースに指定,シェル変数をawk変数にに渡す
-	awk -F[:" "] -v settion_name="${settion_name}" '
+	awk -F[:" "] -v session_name="${session_name}" '
 
-	# 変数"settion_name"セッションにアタッチしていなければ出力
-	$NF != "(attached)" && $1 == settion_name{
+	# 変数"session_name"セッションにアタッチしていなければ出力
+	$NF != "(attached)" && $1 == session_name{
 
 		print $1
 
@@ -28,20 +28,20 @@ settion_check() {
 }
 
 # セッションにアタッチされているか確認
-edit_settion_check=$(settion_check "edit")
-git_settion_check=$(settion_check "git")
+edit_session_check=$(session_check "edit")
+git_session_check=$(session_check "git")
 # ====== 変数の設定ここまで ======
 
 
 # tmuxが起動,かつeditセッションにアタッチしていなければ真
-if [ -n "${edit_settion_check}" ]; then
+if [ -n "${edit_session_check}" ]; then
 
-	tmux a -t "${edit_settion_check}"
+	tmux a -t "${edit_session_check}"
 
 # tmuxが起動していれば真
 elif [ -n "${tmux_list}" ]; then
 
-	tmux a -t "${git_settion_check}"
+	tmux a -t "${git_session_check}"
 
 else
 
