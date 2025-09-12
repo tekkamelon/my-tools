@@ -2,34 +2,27 @@
 
 set -eu
 
-# gemini-cliの有無を確認
-if ! command -v gemini > /dev/null; then
+# コマンドの存在確認関数
+check_command(){
 
-	# ヒアドキュメントでエラーメッセージを表示
-	cat <<- EOS >&2
-    gemini is not installed or not in PATH.
-	Please install gemini and try again.
-	$ npx https://github.com/google-gemini/gemini-cli
-	or
-	$ npm install -g @google/gemini-cli
-	EOS
+	# 第1引数として与えられたコマンドの有無を確認,第2引数のメッセージを表示
+    if ! command -v "${1}" > /dev/null; then
 
-	exit 1
+        cat <<- EOS >&2
+		${1} is not installed or not in PATH.
+		Please install $1 and try again.
+		${2}
+		EOS
 
-fi
+        exit 1
 
-# fzfの有無を確認
-if ! command -v fzf > /dev/null; then
+    fi
 
-	cat <<- EOS >&2
-	fzf is not installed or not in PATH.
-	Please install fzf and try again.
-	$ sudo apt install fzf
-	EOS
+}
 
-	exit 1
-
-fi
+# geminiとfzfの存在確認
+check_command "gemini" "npx https://github.com/google-gemini/gemini-cli or npm install -g @google/gemini-cli"
+check_command "fzf" "sudo apt install fzf"
 
 # メニュー項目の定義
 menu_items=$(cat <<- EOS
