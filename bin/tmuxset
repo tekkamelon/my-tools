@@ -45,8 +45,8 @@ elif [ -n "${tmux_list}" ]; then
 
 else
 
-	# ホームディレクトリに戻る
-	cd "${HOME}" || exit
+	# ホームディレクトリに戻る,失敗時にはエラー終了
+	cd "${HOME}" || exit 1
 
 	# 作成するセッション名を定義
 	sessions="edit git docker music network command"
@@ -54,28 +54,24 @@ else
 	# tmuxサーバーを起動
 	tmux start-server
 
-	# ループで各セッションを作成
+    # セッションとウィンドウを一括作成
 	for session in ${sessions}; do
 
-	    tmux new-session -d -s "${session}"
+		# 新規セッションを作成
+        tmux new-session -d -s "${session}"
 
-	done
+		# "sessions"が"command"以外の場合にウィンドウを分割
+        if [ "${session}" != "command" ]; then
 
-	tmux new-session -d
+            tmux split-window -v -t "${session}"
+
+        fi
+
+    done
 
 	# 新規ウィンドウを作成
 	tmux new-window -t git 
 	tmux new-window -t music
-
-	# セッションを再定義
-	sessions="edit git docker music network"
-
-	# ループで各セッションのウィンドウを分割
-	for session in ${sessions}; do
-
-		tmux split-window -v -t "${session}" 
-
-	done
 
 	# "edit"セッションにアタッチ
 	tmux a -t edit
