@@ -61,11 +61,16 @@ else
         tmux new-session -d -s "${session}"
 
 		# "sessions"が"edit"及び"command"以外の場合にウィンドウを分割
-        if [ "${session}" != "edit" ] && [ "${session}" != "command" ]; then
+		case "${session}" in
 
-            tmux split-window -v -t "${session}"
+			edit|command)
+				;;
 
-        fi
+			*)
+				tmux split-window -v -t "${session}"
+				;;
+
+		esac
 
     done
 
