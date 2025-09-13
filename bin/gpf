@@ -27,8 +27,9 @@ check_command "fzf" "sudo apt install fzf"
 # メニュー項目の定義
 menu_items=$(cat <<- EOS
 1:git commitの作成
-2:READMEへの反映
-3:READMEを添削
+2:git commitの打ち消し
+3:READMEへの反映
+4:READMEを添削
 EOS
 )
 
@@ -39,13 +40,16 @@ selected=$(echo "${menu_items}" | fzf --reverse --prompt="操作を選択 > " | 
 case "${selected}" in
 
     1)
-        message="gitから変更点を確認し適切なコミットを作成してください。コミットの作成時に許可を得る必要はありません"
+        message="gitから変更点を確認し適切なコミットを作成してください.コミットの作成時に許可を得る必要はありません"
         ;;
-    2)
-        message="gitから変更点を確認し必要であればREADME.mdに追記してください"
-        ;;
+	2)
+		message="1つ前のgit commitを打ち消してください.操作時に許可は不要です"
+		;;
     3)
-        message="README.mdの内容を添削し変更点を別ファイルに書き出してください"
+        message="gitの履歴を確認し必要であれば@README.mdに追記してください"
+        ;;
+    4)
+        message="@README.mdの内容を添削し変更点を別ファイルに書き出してください"
         ;;
     *)
         exit 1
