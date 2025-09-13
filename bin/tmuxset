@@ -1,10 +1,10 @@
 #!/bin/sh
 
-set -u
+set -eu
 
 # ====== 変数の設定 ======
-# セッション一覧を変数に代入
-tmux_list=$(tmux ls)
+# 作成するセッション名を定義
+sessions="edit git docker music network command workspace"
 
 # セッションにアタッチされているか確認する関数
 session_check() {
@@ -12,7 +12,8 @@ session_check() {
 	# セッション名を変数に代入
 	session_name="${1}"
 
-	echo "${tmux_list}" |
+	# tmuxのセッション一覧を取得
+	tmux ls |
 
 	# 区切り文字を":"とスペースに指定,シェル変数をawk変数に渡す
 	awk -F':| ' -v session_name="${session_name}" '
@@ -48,9 +49,6 @@ else
 	# ホームディレクトリに戻る,失敗時にはエラー終了
 	cd "${HOME}" || exit 1
 
-	# 作成するセッション名を定義
-	sessions="edit git docker music network command workspace"
-
 	# tmuxサーバーを起動
 	tmux start-server
 
@@ -60,12 +58,16 @@ else
 		# 新規セッションを作成
         tmux new-session -d -s "${session}"
 
-		# "sessions"が"edit"及び"command"以外の場合にウィンドウを分割
-        if [ "${session}" != "edit" ] && [ "${session}" != "command" ]; then
+        # "edit"及び"command"以外の場合にウィンドウを分割
+        case "${session}" in
 
-            tmux split-window -v -t "${session}"
+            edit|command)
+				;;
 
-        fi
+            *)
+                tmux split-window -v -t "${session}"
+                ;;
+        esac
 
     done
 
