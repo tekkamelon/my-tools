@@ -14,8 +14,8 @@ session_check() {
 
 	echo "${tmux_list}" |
 
-	# 区切り文字を":"とスペースに指定,シェル変数をawk変数にに渡す
-	awk -F[:" "] -v session_name="${session_name}" '
+	# 区切り文字を":"とスペースに指定,シェル変数をawk変数に渡す
+	awk -F':| ' -v session_name="${session_name}" '
 
 	# 変数"session_name"セッションにアタッチしていなければ出力
 	$NF != "(attached)" && $1 == session_name{
@@ -61,17 +61,21 @@ else
 
 	done
 
-	tmux new-session -d ;
+	tmux new-session -d
 
 	# 新規ウィンドウを作成
 	tmux new-window -t git 
 	tmux new-window -t music
 
-	# ペインを分割
-	tmux split-window -v -t git
-	tmux split-window -v -t docker
-	tmux split-window -v -t music
-	tmux split-window -v -t network
+	# セッションを再定義
+	sessions="edit git docker music network"
+
+	# ループで各セッションのウィンドウを分割
+	for session in ${sessions}; do
+
+		tmux split-window -v -t "${session}" 
+
+	done
 
 	# "edit"セッションにアタッチ
 	tmux a -t edit
