@@ -34,7 +34,7 @@ EOS
 )
 
 # 選択処理
-selected=$(echo "${menu_items}" | fzf --reverse --prompt="操作を選択 > " | cut -d":" -f1)
+selected=$(echo "${menu_items}" | fzf --layout=reverse --prompt="操作を選択 > " | cut -d":" -f1)
 
 # 選択処理で受け取った変数に応じプロンプトを変数に代入
 case "${selected}" in
