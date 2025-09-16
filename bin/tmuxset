@@ -18,7 +18,7 @@ session_check() {
 	awk -F':| ' -v session_name="${session_name}" '
 
 	# 変数"session_name"セッションにアタッチしていなければ出力
-	$NF != "(attached)" && $1 == session_name{
+	$1 == session_name && $NF != "(attached)"{
 
 		print $1
 
@@ -60,10 +60,10 @@ else
 		# 新規セッションを作成
         tmux new-session -d -s "${session}"
 
-		# "sessions"が"edit"及び"command"以外の場合にウィンドウを分割
+		# "sessions"が"edit"及び"workspace"以外の場合にウィンドウを分割
 		case "${session}" in
 
-			edit|command)
+			edit|workspace)
 				;;
 
 			*)
