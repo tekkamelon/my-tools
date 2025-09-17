@@ -43,7 +43,7 @@ case "${selected}" in
         message="gitから変更点を確認し適切なコミットを作成してください.コミットの作成時に許可を得る必要はありません"
         ;;
 	2)
-		message="1つ前のgit commitを打ち消してください.操作時に許可は不要です"
+		message="現在のgit commitをgit revertで打ち消してください.操作時に許可は不要です"
 		;;
     3)
         message="gitの履歴を確認し必要であれば@README.mdに追記してください"
