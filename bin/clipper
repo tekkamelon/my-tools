@@ -1,42 +1,40 @@
 #!/bin/sh 
 
-# shellcheck disable=SC1091
-
 set -eu
 
-# ====== 変数の処理 ======
+# shellcheck disable=SC1091
+
 # ロケールの設定
 export LC_ALL=C
 export LANG=C
 
-# ".abcde.conf"があれば真
-if [ -e "${HOME}"/.abcde.conf ] ; then
+# 設定ファイルの読み込み
+if [ -e "${HOME}/.abcde.conf" ]; then
 
 	# 設定ファイルの変数を読み込み
 	. "${HOME}/.abcde.conf"
 
-elif [ -e "/etc/abcde.conf" ] ; then
+elif [ -e "/etc/abcde.conf" ]; then
 
 	# 設定ファイルの変数を読み込み
 	. /etc/abcde.conf
 
 else
 
+    # 設定ファイルが存在しない場合、初期値を設定
 	export ALBUMARTFILE="Folder.jpg"
+	# 現在のディレクトリ
 	export OUTPUTDIR="${PWD}"
 
 fi
 
-# 実行時点のディレクトリ
+# 実行時点のディレクトリを保存
 pre_dir="${PWD}"
 
-# 引数で指定されたディレクトリ
-working_dir="${*}"
+# 第一引数が指定されていればそのディレクトリに移動し、なければOUTPUTDIRへ移動
+if [ "${#}" -ge 1 ]; then
 
-#引数があれば真
-if [ -n "${working_dir}" ] ; then
-
-	cd "${working_dir}"
+    cd "${1}"
 
 else
 
@@ -44,43 +42,39 @@ else
 
 fi
 
-# カバーアートのディレクトリ
+# カバーアートのディレクトリ名
 coverart="albumart_backup"
 
-# CDDBから取得したデータ
+# CDDBから取得したデータをキャプチャ
 acquired_data=$(abcde -a cddb -N 2>&1)
 
-# 取得したデータのチェック用
-set +e
-cddb_check=$(echo "${acquired_data}" | grep "error \"Not Found\"")
-set -e
-# ====== 変数の処理ここまで ======
+# CDDBデータ取得結果のエラーチェック
 
+if echo "${acquired_data}" | grep -q 'error "Not Found"'; then
 
-# CDDBからデータを取得できなければ真
-if [ "${cddb_check#*error }" = "\"Not Found\"" ] ; then
+    echo "Error: CD data is not found for CDDB!" >&2
+    exit 1
 
-	# エラーメッセージを出力
-	echo "Error: CD data is not found for CDDB!" 1>&2
+fi
+
+# 非対話的に処理：カバーアートを取得、ファイルに埋め込み、中間ファイルを生成しない
+abcde -N -G -B -P -p -a cddb,encode,tag,move,clean
+
+# カバーアートのディレクトリを検索（-dオプションの代わりに-type dを使用）
+coverart_dir=$(find "${PWD}" -type d -name "${coverart}" 2> /dev/null)
+
+# カバーアートディレクトリが存在すればその中に移動し、ファイルを上位ディレクトリへ移動
+if [ -n "${coverart_dir}" ]; then
+
+	cd "${coverart_dir}"
+    mv "${ALBUMARTFILE}" ..
+    cd ..
+    rmdir "${coverart}" || true
+	cd "${pre_dir}"
 
 else
 
-	# 非対話的に処理,カバーアートを取得,ファイルに埋め込み,中間ファイルを生成しない
-	abcde -N -G -B -P -p -a cddb,encode,tag,move,clean &&
-
-	# カバーアートのディレクトリを取得,エラー出力を捨てる
-	coverart_dir=$(find "${PWD}" -d -name "${coverart}" 2> /dev/null)
-
-	# # カバーアートのパスに移動
-	cd "${coverart_dir}"
-
-	mv "${ALBUMARTFILE}" ../
-
-	cd ../
-
-	rmdir "${coverart}"
-
-	cd "${pre_dir}"
+    echo "カバーアートのディレクトリが見つかりませんでした" >&2
 
 fi
 
