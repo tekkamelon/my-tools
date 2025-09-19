@@ -1,22 +1,27 @@
 #!/bin/sh 
 
-set -eu
-
 # shellcheck disable=SC1091
 
-# ロケールの設定
+set -eu
+
 export LC_ALL=C
 export LANG=C
 
-# 設定ファイルの読み込み
+# 現在のディレクトリ
+pre_dir="${PWD}"
+
+# カバーアートのディレクトリ名
+coverart="albumart_backup"
+
+# ホームディレクトリに設定ファイルがあれば真
 if [ -e "${HOME}/.abcde.conf" ]; then
 
 	# 設定ファイルの変数を読み込み
 	. "${HOME}/.abcde.conf"
 
+# /etc以下に設定ファイルがあれば真
 elif [ -e "/etc/abcde.conf" ]; then
 
-	# 設定ファイルの変数を読み込み
 	. /etc/abcde.conf
 
 else
@@ -28,55 +33,38 @@ else
 
 fi
 
-# 実行時点のディレクトリを保存
-pre_dir="${PWD}"
+# 第一引数が指定されていればそのディレクトリに移動,なければOUTPUTDIRへ移動
+cd "${1:-$OUTPUTDIR}"
 
-# 第一引数が指定されていればそのディレクトリに移動し、なければOUTPUTDIRへ移動
-if [ "${#}" -ge 1 ]; then
+# CDDBからデータを取得
+acquired_data="$(abcde -a cddb -N 2>&1)"
 
-    cd "${1}"
-
-else
-
-	cd "${OUTPUTDIR}"
-
-fi
-
-# カバーアートのディレクトリ名
-coverart="albumart_backup"
-
-# CDDBから取得したデータをキャプチャ
-acquired_data=$(abcde -a cddb -N 2>&1)
-
-# CDDBデータ取得結果のエラーチェック
-
+# CDDBからデータを取得できなければ真
 if echo "${acquired_data}" | grep -q 'error "Not Found"'; then
 
+	# エラーメッセージを出力
     echo "Error: CD data is not found for CDDB!" >&2
     exit 1
 
 fi
 
-# 非対話的に処理：カバーアートを取得、ファイルに埋め込み、中間ファイルを生成しない
+# 非対話的に処理:取得したカバーアートをファイルに埋め込み,中間ファイルを生成しない
 abcde -N -G -B -P -p -a cddb,encode,tag,move,clean
 
-# カバーアートのディレクトリを検索（-dオプションの代わりに-type dを使用）
-coverart_dir=$(find "${PWD}" -type d -name "${coverart}" 2> /dev/null)
+# カバーアートのディレクトリを検索
+coverart_dir=$(find "${PWD}" -type d -name "${coverart}")
 
-# カバーアートディレクトリが存在すればその中に移動し、ファイルを上位ディレクトリへ移動
+# カバーアートのディレクトリが存在すれば真
 if [ -n "${coverart_dir}" ]; then
 
-	cd "${coverart_dir}"
-    mv "${ALBUMARTFILE}" ..
-    cd ..
-    rmdir "${coverart}" || true
-	cd "${pre_dir}"
-
-else
-
-    echo "カバーアートのディレクトリが見つかりませんでした" >&2
+	# カバーアートをカレントディレクトリに移動
+    mv "${coverart_dir}/${ALBUMARTFILE}" .
+    rmdir "${coverart_dir}" || true
 
 fi
+
+# 現在のディレクトリを元に戻す
+cd "${pre_dir}"
 
 eject
 
