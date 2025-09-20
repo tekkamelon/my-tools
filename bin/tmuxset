@@ -2,88 +2,82 @@
 
 set -u
 
-# ====== 変数の設定 ======
-# セッション一覧を変数に代入
-tmux_list=$(tmux ls)
+# tmuxセッション一覧を取得（1回のみ、エラー時は空文字列）
+tmux_list=$(tmux ls 2>/dev/null) || tmux_list=
 
-# セッションにアタッチされているか確認する関数
-session_check() {
+# セッションの存在とアタッチ状態をチェックする関数
+session_status() {
 
-	# セッション名を変数に代入
-	session_name="${1}"
+    session_name="${1}"
 
-	echo "${tmux_list}" |
+    echo "${tmux_list}" | awk -F':| ' -v name="${session_name}" '
 
-	# 区切り文字を":"とスペースに指定,シェル変数をawk変数に渡す
-	awk -F':| ' -v session_name="${session_name}" '
+	$1 == name {
 
-	# 変数"session_name"セッションにアタッチしていなければ出力
-	$1 == session_name && $NF != "(attached)"{
+		if ($NF == "(attached)")
 
-		print $1
+			print "attached"
+
+		else 
+
+			print "detached"
 
 	}
 	'
 
 }
 
-# セッションにアタッチされているか確認
-edit_session_check=$(session_check "edit")
-git_session_check=$(session_check "git")
-# ====== 変数の設定ここまで ======
+# 既存セッションのチェック
+edit_status=$(session_status "edit")
+git_status=$(session_status "git")
 
+# editセッションが存在し、detachedならアタッチ
+if [ "${edit_status}" = "detached" ]; then
 
-# tmuxが起動,かつeditセッションにアタッチしていなければ真
-if [ -n "${edit_session_check}" ]; then
+    exec tmux attach-session -t edit
 
-	tmux a -t "${edit_session_check}"
+# gitセッションが存在し、detachedならアタッチ
+elif [ "${git_status}" = "detached" ]; then
 
-# tmuxが起動していれば真
+    exec tmux attach-session -t git
+
+# tmuxが起動していれば、既存のいずれかにアタッチ
 elif [ -n "${tmux_list}" ]; then
 
-	tmux a -t "${git_session_check}"
+    exec tmux attach-session
 
-else
+fi
 
-	# ホームディレクトリに戻る,失敗時にはエラー終了
-	cd "${HOME}" || exit 1
+# 新規セッション作成
+cd "${HOME}" || exit 1
+tmux start-server
 
-	# 作成するセッション名を定義
-	sessions="edit git docker music network command workspace"
+# セッションとウィンドウを一括作成
+sessions="edit git docker music network command workspace"
 
-	# tmuxサーバーを起動
-	tmux start-server
+for session in ${sessions}; do
 
-    # セッションとウィンドウを一括作成
-	for session in ${sessions}; do
+    tmux new-session -d -s "${session}"
 
-		# 新規セッションを作成
-        tmux new-session -d -s "${session}"
+    case "${session}" in
 
-		# "sessions"が"edit"及び"workspace"以外の場合にウィンドウを分割
-		case "${session}" in
+        edit|workspace)
+			;;
 
-			edit|workspace)
-				;;
-
-			*)
-				tmux split-window -v -t "${session}"
-				;;
+        *)
+			tmux split-window -v -t "${session}"
+			;;
 
 		esac
 
-    done
+done
 
-	# 新規ウィンドウを作成
-	tmux new-window -t git 
-	tmux new-window -t music
+# gitとmusicに追加ウィンドウと分割
+tmux new-window -t git
+tmux split-window -v -t git
+tmux new-window -t music
+tmux split-window -v -t music
 
-	# ウィンドウを分割
-	tmux split-window -v -t "git"
-	tmux split-window -v -t "music"
-
-	# "edit"セッションにアタッチ
-	tmux a -t edit
-
-fi
+# editにアタッチ
+exec tmux attach-session -t edit
 
