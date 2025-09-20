@@ -2,8 +2,8 @@
 
 set -u
 
-# tmuxセッション一覧を取得（1回のみ、エラー時は空文字列）
-tmux_list=$(tmux ls 2>/dev/null) || tmux_list=
+# tmuxセッション一覧を取得(1回のみ,エラー時は空文字列)
+tmux_list="$(tmux ls 2>/dev/null)" || tmux_list=""
 
 # セッションの存在とアタッチ状態をチェックする関数
 session_status() {
@@ -12,7 +12,7 @@ session_status() {
 
     echo "${tmux_list}" | awk -F':| ' -v name="${session_name}" '
 
-	$1 == name {
+	$1 == name{
 
 		if ($NF == "(attached)")
 
@@ -28,20 +28,20 @@ session_status() {
 }
 
 # 既存セッションのチェック
-edit_status=$(session_status "edit")
-git_status=$(session_status "git")
+edit_status="$(session_status "edit")"
+git_status="$(session_status "git")"
 
-# editセッションが存在し、detachedならアタッチ
+# editセッションが存在し,detachedならアタッチ
 if [ "${edit_status}" = "detached" ]; then
 
     exec tmux attach-session -t edit
 
-# gitセッションが存在し、detachedならアタッチ
+# gitセッションが存在し,detachedならアタッチ
 elif [ "${git_status}" = "detached" ]; then
 
     exec tmux attach-session -t git
 
-# tmuxが起動していれば、既存のいずれかにアタッチ
+# tmuxが起動していれば,既存のいずれかにアタッチ
 elif [ -n "${tmux_list}" ]; then
 
     exec tmux attach-session
@@ -55,10 +55,12 @@ tmux start-server
 # セッションとウィンドウを一括作成
 sessions="edit git docker music network command workspace"
 
+# for文でセッションを一括作成
 for session in ${sessions}; do
 
     tmux new-session -d -s "${session}"
 
+	# edit,workspaceの場合はウィンドウを分割しない
     case "${session}" in
 
         edit|workspace)
@@ -68,11 +70,11 @@ for session in ${sessions}; do
 			tmux split-window -v -t "${session}"
 			;;
 
-		esac
+	esac
 
 done
 
-# gitとmusicに追加ウィンドウと分割
+# gitとmusicに新規ウィンドウを作成し分割
 tmux new-window -t git
 tmux split-window -v -t git
 tmux new-window -t music
