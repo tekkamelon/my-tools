@@ -2,22 +2,23 @@
 
 set -eu
 
-# gemini,qwenどちらもなければメッセージを表示
-# geminiとqwenの存在確認とメニュー作成
 available_tools=""
 
+# geminiの有無を確認
 if command -v gemini > /dev/null 2>&1; then
 
     available_tools="${available_tools}\ngemini"
 
 fi
 
+# qwenの有無を確認
 if command -v qwen > /dev/null 2>&1; then
 
     available_tools="${available_tools}\nqwen"
 
 fi
 
+# gemini,qwenどちらもなければインストールを促すメッセージを出力
 if [ -z "${available_tools}" ]; then
 
     cat <<- EOS >&2
@@ -34,6 +35,7 @@ fi
 # AIツール選択メニュー
 ai_tool=$(echo "${available_tools}" | fzf --layout=reverse --prompt="AIツールを選択 > ")
 
+# AIツールを選択しなければ終了
 if [ -z "${ai_tool}" ]; then
 
     exit 1
@@ -85,3 +87,4 @@ case "${ai_tool}" in
         ;;
 
 esac
+
