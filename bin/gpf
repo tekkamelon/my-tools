@@ -2,27 +2,43 @@
 
 set -eu
 
-# コマンドの存在確認関数
-check_command(){
+# gemini,qwenどちらもなければメッセージを表示
+# geminiとqwenの存在確認とメニュー作成
+available_tools=""
 
-	# 第1引数として与えられたコマンドの有無を確認,第2引数のメッセージを表示
-    if ! command -v "${1}" > /dev/null; then
+if command -v gemini > /dev/null 2>&1; then
 
-        cat <<- EOS >&2
-		${1} is not installed or not in PATH.
-		Please install $1 and try again.
-		${2}
-		EOS
+    available_tools="${available_tools}\ngemini"
 
-        exit 1
+fi
 
-    fi
+if command -v qwen > /dev/null 2>&1; then
 
-}
+    available_tools="${available_tools}\nqwen"
 
-# geminiとfzfの存在確認
-check_command "gemini" "npx https://github.com/google-gemini/gemini-cli or npm install -g @google/gemini-cli"
-check_command "fzf" "sudo apt install fzf"
+fi
+
+if [ -z "${available_tools}" ]; then
+
+    cat <<- EOS >&2
+		Neither gemini nor qwen is installed or not in PATH.
+		Please install one of them:
+		For gemini: npx https://github.com/google-gemini/gemini-cli or npm install -g @google/gemini-cli
+		For qwen: npm install -g @qwen-code/qwen-code
+	EOS
+
+    exit 1
+
+fi
+
+# AIツール選択メニュー
+ai_tool=$(echo "${available_tools}" | fzf --layout=reverse --prompt="AIツールを選択 > ")
+
+if [ -z "${ai_tool}" ]; then
+
+    exit 1
+
+fi
 
 # メニュー項目の定義
 menu_items=$(cat <<- EOS
@@ -57,6 +73,15 @@ case "${selected}" in
 
 esac
 
-# gemini-cliに処理を依頼,非対話モードかつ自律モードを有効化
-gemini --yolo -p "${message}"
+# 選択されたAIツールで実行
+case "${ai_tool}" in
 
+    gemini)
+        gemini --yolo -p "${message}"
+        ;;
+
+    qwen)
+        qwen --yolo -p "${message}"
+        ;;
+
+esac
