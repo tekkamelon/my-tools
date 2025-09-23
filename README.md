@@ -195,5 +195,5 @@
 
 ## gpf
 
-- fzfとgemini-cliを連携させ、定型的なgit操作やREADMEの編集作業を支援
+- fzfと各種AIツール(gemini-cli, qwen-code)を連携,定型的なgit操作やREADMEの編集作業を支援
 
