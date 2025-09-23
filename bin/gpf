@@ -7,7 +7,7 @@ export LANG=C
 export LC_ALL=C
 export POSIXLY_CORRECT=1
 
-# geminiとqwenの両方がインストールされてれば真
+# geminiとqwenの両方がインストールされてれば真
 if command -v gemini > /dev/null 2>&1 && command -v qwen > /dev/null 2>&1; then
 
 	# AIツール選択メニュー
@@ -26,15 +26,15 @@ elif command -v qwen > /dev/null 2>&1; then
 
 	ai_tool=qwen
 
-# geminiもqwenもインストールされていなければ真
-elif ! command -v gemini > /dev/null 2>&1 && ! command -v qwen > /dev/null 2>&1; then
+# いずれもインストールされていない場合
+else
 
 	# AIツール選択メニュー
-    cat <<- EOS >&2
-		Neither gemini nor qwen is installed or not in PATH.
-		Please install one of them:
-		For gemini: npx https://github.com/google-gemini/gemini-cli or npm install -g @google/gemini-cli
-		For qwen: npm install -g @qwen-code/qwen-code
+	cat <<- EOS >&2
+		gemini または qwen がインストールされていないか,PATHにありません
+		いずれかをインストールしてください
+		gemini の場合: npx https://github.com/google-gemini/gemini-cli または npm install -g @google/gemini-cli@latest
+		qwen の場合: npm install -g @qwen-code/qwen-code@latest
 	EOS
 
     exit 1
