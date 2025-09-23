@@ -2,41 +2,40 @@
 
 set -eu
 
-available_tools=""
+# 環境変数の設定
+export LANG=C
+export LC_ALL=C
+export POSIXLY_CORRECT=1
 
-# geminiの有無を確認
-if command -v gemini > /dev/null 2>&1; then
+# geminiとqwenの両方がインストールされてれば真
+if command -v gemini > /dev/null 2>&1 && command -v qwen > /dev/null 2>&1; then
 
-    available_tools="${available_tools}\ngemini"
+	# AIツール選択メニュー
+	ai_tool=$(printf "gemini\nqwen\n" | fzf --layout=reverse --prompt="AIツールを選択 > ")
 
-fi
+	# AIツールを選択しなければ終了
+	test -z "${ai_tool}" && exit 1
 
-# qwenの有無を確認
-if command -v qwen > /dev/null 2>&1; then
+# geminiしかインストールされていなければ真
+elif command -v gemini > /dev/null 2>&1; then
 
-    available_tools="${available_tools}\nqwen"
+	ai_tool=gemini
 
-fi
+# qwenしかインストールされていなければ真
+elif command -v qwen > /dev/null 2>&1; then
 
-# gemini,qwenどちらもなければインストールを促すメッセージを出力
-if [ -z "${available_tools}" ]; then
+	ai_tool=qwen
 
+# geminiもqwenもインストールされていなければ真
+elif ! command -v gemini > /dev/null 2>&1 && ! command -v qwen > /dev/null 2>&1; then
+
+	# AIツール選択メニュー
     cat <<- EOS >&2
 		Neither gemini nor qwen is installed or not in PATH.
 		Please install one of them:
 		For gemini: npx https://github.com/google-gemini/gemini-cli or npm install -g @google/gemini-cli
 		For qwen: npm install -g @qwen-code/qwen-code
 	EOS
-
-    exit 1
-
-fi
-
-# AIツール選択メニュー
-ai_tool=$(echo "${available_tools}" | fzf --layout=reverse --prompt="AIツールを選択 > ")
-
-# AIツールを選択しなければ終了
-if [ -z "${ai_tool}" ]; then
 
     exit 1
 
@@ -52,10 +51,12 @@ EOS
 )
 
 # 選択処理
-selected=$(echo "${menu_items}" | fzf --layout=reverse --prompt="操作を選択 > " | cut -d":" -f1)
+selected=$(echo "${menu_items}" | fzf --layout=reverse --prompt="操作を選択 > ")
+# 変数展開で数値を抽出
+extracted="${selected%%:*}"
 
 # 選択処理で受け取った変数に応じプロンプトを変数に代入
-case "${selected}" in
+case "${extracted}" in
 
     1)
         message="gitから変更点を確認し適切なコミットを作成してください.コミットの作成時に許可を得る必要はありません"
@@ -87,4 +88,5 @@ case "${ai_tool}" in
         ;;
 
 esac
+
 
