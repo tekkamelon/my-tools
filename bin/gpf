@@ -11,7 +11,7 @@ export POSIXLY_CORRECT=1
 if command -v gemini > /dev/null 2>&1 && command -v qwen > /dev/null 2>&1; then
 
 	# AIツール選択メニュー
-	ai_tool=$(printf "gemini\nqwen\n" | fzf --layout=reverse --prompt="AIツールを選択 > ")
+	ai_tool=$(printf "gemini\nqwen\n" | fzf --layout=reverse --prompt=" AIツールを選択 > ")
 
 	# AIツールを選択しなければ終了
 	test -z "${ai_tool}" && exit 1
@@ -51,7 +51,7 @@ EOS
 )
 
 # 選択処理
-selected=$(echo "${menu_items}" | fzf --layout=reverse --prompt="操作を選択 > ")
+selected=$(echo "${menu_items}" | fzf --layout=reverse --prompt=" ${ai_tool}: 操作を選択 > ")
 # 変数展開で数値を抽出
 extracted="${selected%%:*}"
 
@@ -88,5 +88,4 @@ case "${ai_tool}" in
         ;;
 
 esac
-
 
