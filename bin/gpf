@@ -45,8 +45,9 @@ fi
 menu_items=$(cat <<- EOS
 1:git commitの作成
 2:git commitの打ち消し
-3:READMEへの反映
-4:READMEを添削
+3:git addされた変更をcommit
+4:READMEへの反映
+5:READMEを添削
 EOS
 )
 
@@ -59,15 +60,18 @@ extracted="${selected%%:*}"
 case "${extracted}" in
 
     1)
-        message="gitから変更点を確認し適切なコミットを作成してください.コミットの作成時に許可を得る必要はありません"
+        message="gitから変更点を確認し適切なコミットを作成してください.コミットの作成時に許可は不要です"
         ;;
 	2)
 		message="現在のgit commitをgit revertで打ち消してください.操作時に許可は不要です"
 		;;
-    3)
+	3)
+		message="git addされたファイルを確認し適切なコミットを作成して下さい.操作時に許可は不要です"
+		;;
+    4)
         message="gitの履歴を確認し必要であれば@README.mdに追記してください"
         ;;
-    4)
+    5)
         message="@README.mdの内容を添削し変更点を別ファイルに書き出してください"
         ;;
     *)
