@@ -60,7 +60,7 @@ extracted="${selected%%:*}"
 case "${extracted}" in
 
     1)
-        message="gitから変更点を確認し適切なコミットを作成してください.コミットの作成時に許可は不要です"
+        message="gitから変更点を確認,ファイルごとにそれぞれ適切なコミットを作成してください.コミットの作成時に許可は不要です"
         ;;
 	2)
 		message="現在のgit commitをgit revertで打ち消してください.操作時に許可は不要です"
