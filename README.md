@@ -197,3 +197,15 @@
 
 - fzfと各種AIツール(gemini-cli, qwen-code)を連携,定型的なgit操作やREADMEの編集作業を支援
 
+## mdt2c
+
+- markdownのtableを特定の文字列(デフォルトではカンマ)で区切られたテキストファイルに変換
+
+- デフォルトの区切り文字はカンマ
+
+- オプション
+
+    - -v ofs="output field separator"
+
+        - "output field separator"で指定された文字を区切り文字として処理
+
