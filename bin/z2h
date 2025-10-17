@@ -1,28 +1,52 @@
-#!/bin/sh -eu
+#!/bin/sh 
+
+set -eu
 
 # shellcheck disable=SC1112
 
-# 標準入力がある場合
+# 全角文字から半角文字への変換関数
+convert_to_halfwidth() {
+    sed 'y/ＡＢＣＤＥＦＧＨＩＪＫＬＭＮＯＰＱＲＳＴＵＶＷＸＹＺａｂｃｄｅｆｇｈｉｊｋｌｍｎｏｐｑｒｓｔｕｖｗｘｙｚ０１２３４５６７８９/ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789/; y/　／（）’"！？/ \/\(\)'\''"\!\?/'
+}
+
+# 標準入力からの処理
 if [ -p /dev/stdin ]; then
 
-    sed 'y/ＡＢＣＤＥＦＧＨＩＪＫＬＭＮＯＰＱＲＳＴＵＶＷＸＹＺａｂｃｄｅｆｇｈｉｊｋｌｍｎｏｐｑｒｓｔｕｖｗｘｙｚ０１２３４５６７８９/ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789/; y/　／（）’”！？/ \/\(\)'\''"\!\?/' /dev/stdin
+	convert_to_halfwidth
 
-# 引数がある場合
+# 引数からの処理
 elif [ "${#}" -gt 0 ]; then
 
-    file="${1}"
-    tmpfile="$(mktemp)"
+file="${1}"
 
-    # 一時ファイルに書き込み
-    sed 'y/ＡＢＣＤＥＦＧＨＩＪＫＬＭＮＯＰＱＲＳＴＵＶＷＸＹＺａｂｃｄｅｆｇｈｉｊｋｌｍｎｏｐｑｒｓｔｕｖｗｘｙｚ０１２３４５６７８９/ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789/; y/　／（）’”！？/ \/\(\)'\''"\!\?/' "${file}" > "${tmpfile}"
+	# ファイル存在確認
+	if [ ! -f "${file}" ]; then
+		echo "Error: File '${file}' not found." >&2
+		exit 1
+	fi
 
+	# ファイルが書き込み可能か確認
+	if [ ! -w "${file}" ]; then
+		echo "Error: File '${file}' is not writable." >&2
+		exit 1
+	fi
+
+	# 全角文字から半角文字への変換,一時ファイルに保存
+	cat "${file}" | convert_to_halfwidth > "${file}.tmp" &&
+	
 	# 一時ファイルを元のファイルに上書き
-    mv "${tmpfile}" "${file}"
+	mv "${file}.tmp" "${file}"
 
 else
 
-    echo "Error: Please provide either stdin or a file argument." >&2
-    exit 1
+	# 引数なしの場合はエラーメッセージを出力
+	cat <<- EOF >&2
+	Error: Please provide either stdin input or a file argument.
+	Usage: echo '全角文字' | z2h
+           z2h filename
+	EOF
+	
+	exit 1
 
 fi
 
