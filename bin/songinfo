@@ -64,5 +64,6 @@ if [ ! -f "$img_dir" ]; then
 
 fi
 
-notify-send "$(mpc status)" -i "${img_dir}" &
+# 通知を送信,4秒で消える
+notify-send -t 4000 "$(mpc status)" -i "${img_dir}" &
 
