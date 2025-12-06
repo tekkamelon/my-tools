@@ -30,8 +30,8 @@ music_dir=$(get_music_dir)
 # music_directoryが見つからない場合のエラー処理
 if [ -z "${music_dir}" ]; then
 
-	# エラーメッセージを通知
-    notify-send "Error: mpd.conf not found or music_directory not set" &
+	# エラーメッセージを通知,4秒で消える
+    notify-send -t 4000 "Error: mpd.conf not found or music_directory not set" &
     echo "Error: mpd.conf not found or music_directory not set" >&2
 
     exit 1
@@ -44,7 +44,7 @@ current_song=$(mpc current -f "%file%" 2>/dev/null)
 # current_songが空の場合のエラー処理
 if [ -z "${current_song}" ]; then
 
-    notify-send "Error: No song is currently playing" &
+    notify-send -t 4000 "Error: No song is currently playing" &
     echo "Error: No song is currently playing" >&2
 
     exit 1
@@ -64,6 +64,6 @@ if [ ! -f "$img_dir" ]; then
 
 fi
 
-# 通知を送信,4秒で消える
+# 再生中の曲の情報を通知(カバーアートがあれば表示)
 notify-send -t 4000 "$(mpc status)" -i "${img_dir}" &
 
