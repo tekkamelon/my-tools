@@ -1,0 +1,58 @@
+#!/bin/sh
+
+set -eu
+
+# デフォルトのAI CLIを設定
+DEFAULT_AI_CLI="qwen"
+export DEFAULT_AI_CLI
+
+# tmuxセッション一覧を取得 (エラー時は空文字列)
+get_tmux_sessions() {
+    tmux ls 2>/dev/null || echo ""
+}
+
+# 指定セッションの状態を取得 (attached/detached/empty)
+get_session_status() {
+    session_name="${1}"
+    tmux_sessions="${2}"
+
+    echo "${tmux_sessions}" | awk -F':| ' -v name="${session_name}" '
+        $1 == name {
+            if ($NF == "(attached)") {
+                print "attached"
+            } else {
+                print "detached"
+            }
+        }
+    '
+}
+
+# ai_cliセッションが存在しない場合、新規作成してデフォルトCLIツールを起動
+ensure_ai_cli_session() {
+    session_name="ai_cli"
+    status="${1}"
+
+    if [ -z "${status}" ]; then
+        tmux new-session -d -s "${session_name}"
+        tmux send-keys -t "${session_name}" "${DEFAULT_AI_CLI}" C-m
+    fi
+}
+
+# プロンプトを送信 (オプション -p)
+send_prompt() {
+    if [ "${1:-}" = "-p" ] && [ "${#}" -ge 2 ]; then
+        shift
+        prompt="${*}"
+        tmux send-keys -t "ai_cli" "${prompt}" C-m
+    fi
+}
+
+# メイン処理
+main() {
+    tmux_sessions="$(get_tmux_sessions)"
+    ai_cli_status="$(get_session_status "ai_cli" "${tmux_sessions}")"
+    ensure_ai_cli_session "${ai_cli_status}"
+    send_prompt "$@"
+}
+
+main "$@"
