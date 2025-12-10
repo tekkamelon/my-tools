@@ -157,10 +157,6 @@
 
 - abcdeによりcli上でCDリッピング
 
-## csvhs
-
-- ヘッダから引数にマッチする列を抽出
-
 ## musiconv
 
 - 複数の音声ファイルを一括変換
@@ -208,4 +204,56 @@
     - -v ofs="output field separator"
 
         - "output field separator"で指定された文字を区切り文字として処理
+
+## atw
+
+- AI CLIツールをtmuxセッションで管理し、プロンプトを送信するツール
+
+- オプション
+
+    - -p "prompt"
+
+        - 指定されたプロンプトをAI CLIツールに送信
+
+## gdv
+
+- git diffの結果をエディタで表示するツール
+
+- git diffの結果があればエディタで表示、なければgit statusを表示
+
+## refresh_pop-os.sh
+
+- Pop!_OSのリフレッシュインストール後のセットアップ用スクリプト
+
+- 各種ツールのインストールと設定を行う
+
+## setup.sh
+
+- システムセットアップ用スクリプト
+
+- gitリポジトリのクローン、ツールのインストール、設定ファイルの配置などを行う
+
+## tlp-switch.sh
+
+- TLP電源管理ツールのモード切り替え用スクリプト
+
+- オプション
+
+    - bat
+
+        - バッテリーモードに切り替え
+
+    - ac
+
+        - AC電源モードに切り替え
+
+## 99-tailscale_mount.sh
+
+- NetworkManagerディスパッチャー用スクリプト
+
+- Wi-Fi接続状況に応じてTailscaleの接続/切断を行う
+
+## 99-power.rules
+
+- 電源管理用の設定ファイル
 
