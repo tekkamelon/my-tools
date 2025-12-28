@@ -3,7 +3,29 @@
 set -eu
 
 # デフォルトのAI CLIを設定
-DEFAULT_AI_CLI="qwen"
+# 環境変数が設定されていればその値を使用
+if [ -n "${DEFAULT_AI_CLI:-}" ]; then
+    # 環境変数が設定されている場合はその値を使用
+    :
+else
+    # 環境変数が設定されていない場合はパスの通ったディレクトリからコマンドを探す
+    DEFAULT_AI_CLI=""
+    
+    # 優先順位でコマンドをチェック
+    for cmd in gemini qwen codex; do
+        if command -v "${cmd}" >/dev/null 2>&1; then
+            DEFAULT_AI_CLI="${cmd}"
+            break
+        fi
+    done
+    
+    # 見つからない場合はエラーを出力して終了
+    if [ -z "${DEFAULT_AI_CLI}" ]; then
+        echo "Error: DEFAULT_AI_CLI is not set, and none of gemini, qwen, or codex are in PATH" >&2
+        exit 1
+    fi
+fi
+
 export DEFAULT_AI_CLI
 
 # tmuxセッション一覧を取得 (エラー時は空文字列)
