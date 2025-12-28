@@ -257,3 +257,18 @@
 
 - 電源管理用の設定ファイル
 
+
+
+
+## bookworm2trixie.sh
+
+- Debian Bookworm (12) から Trixie へのリリースアップグレードスクリプト
+
+- root権限で実行する必要があります (sudo sh bookworm2trixie.sh)
+
+- /etc/apt/sources.list をバックアップし、bookworm を trixie に置換
+
+- apt update, upgrade, full-upgrade を実行
+
+- 完了後、再起動を推奨
+
