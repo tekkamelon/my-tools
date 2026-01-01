@@ -46,10 +46,16 @@ esac
 
 # アップグレード実行
 echo "最小アップグレードを実行"
-apt upgrade --without-new-pkgs || echo "apt upgradeが失敗しました"
+apt upgrade --without-new-pkgs || {
+    echo "apt upgradeが失敗しました" >&2
+    exit 1
+}
 
 echo "フルアップグレードを実行"
-apt full-upgrade || echo "apt full-upgradeが失敗しました"
+apt full-upgrade || {
+    echo "apt full-upgradeが失敗しました" >&2
+    exit 1
+}
 
 cat << EOF
 アップグレード完了
