@@ -10,6 +10,13 @@ if [ "$(id -u)" -ne 0 ]; then
 	# エラーメッセージ表示
     printf '%s: root権限で実行してください: sudo sh "%s"\n' "${SCRIPT_NAME}" "${0}" >&2
     exit 1
+
+# debian bookwormでなければ終了
+elif ! grep -q '^12\.' /etc/debian_version 2>/dev/null; then
+
+    printf '%s: Debian Bookworm (12) で実行してください。\n' "${SCRIPT_NAME}" >&2
+    exit 1
+
 fi
 
 # 現在のリリース確認 (lsb_release優先、/etc/debian_version fallback)
