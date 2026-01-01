@@ -35,12 +35,12 @@ elif ! grep -q '^12\.' /etc/debian_version 2>/dev/null; then
 fi
 
 # 現在のリリース確認 (lsb_release優先、/etc/debian_version fallback)
-CURRENT_RELEASE="$(lsb_release -cs 2>/dev/null || awk -F= '/^VERSION_CODENAME/{gsub(/"/, "", $2); print $2}' /etc/os-release 2>/dev/null || printf 'unknown\n')"
+current_release="$(lsb_release -cs 2>/dev/null || awk -F= '/^VERSION_CODENAME/{gsub(/"/, "", $2); print $2}' /etc/os-release 2>/dev/null || printf 'unknown\n')"
 
 # # リリースが取得できなかった場合のエラー処理
-case "${CURRENT_RELEASE}" in
+case "${current_release}" in
     bookworm|12) ;;
-    *) printf '%s: Debian Bookworm (12) で実行してください 現在: %s\n' "${script_name}" "${CURRENT_RELEASE}" >&2; exit 1 ;;
+    *) printf '%s: Debian Bookworm (12) で実行してください 現在: %s\n' "${script_name}" "${current_release}" >&2; exit 1 ;;
 esac
 
 # sources.list バックアップ
@@ -62,8 +62,8 @@ cat << EOF
 Trixieリポジトリに切り替えました
 アップグレードを続行しますか? (y/N): 
 EOF
-read -r RESPONSE
-case "${RESPONSE}" in
+read -r response
+case "${response}" in
     [Yy]*) ;;
     *) printf '%s: ユーザー中止\n' "${script_name}" >&2; exit 1 ;;
 esac
