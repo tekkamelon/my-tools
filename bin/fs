@@ -1,0 +1,37 @@
+#!/bin/sh
+
+set -eu
+
+# fzfのインストール確認
+if ! command -v fzf >/dev/null 2>&1; then
+	echo "Error: fzf is not installed" >&2
+	exit 1
+fi
+
+# ".ssh/config"の有無を確認
+if [ ! -f "${HOME}/.ssh/config" ]; then
+	echo "Error: ${HOME}/.ssh/config does not exist" >&2
+	exit 1
+fi
+
+# ホスト名を抽出."Host *"は除外,コメント行を無視
+hosts=$(cat "${HOME}"/.ssh/config | awk -F " " '/^Host[[:space:]]+/ && !/^Host[[:space:]]*\*/ {print $2}')
+
+# Hostがない場合
+if [ -z "${hosts}" ]; then
+	echo "Error: No hosts found in ${HOME}/.ssh/config" >&2
+	exit 1
+fi
+
+# fzfで逆順表示,プロンプトを表示して選択
+selected_host=$(echo "${hosts}" | fzf --reverse --prompt="Select SSH host: ")
+
+# 選択されなかった場合
+if [ -z "${selected_host}" ]; then
+	echo "Error: No host selected" >&2
+	exit 1
+fi
+
+# ssh接続
+exec ssh "${selected_host}"
+

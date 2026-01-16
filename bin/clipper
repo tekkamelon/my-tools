@@ -7,64 +7,70 @@ set -eu
 export LC_ALL=C
 export LANG=C
 
-# 現在のディレクトリ
-pre_dir="${PWD}"
+# 定数
+CDDB_TIMEOUT=2
+COVERART_DIRNAME="albumart_backup"
 
-# カバーアートのディレクトリ名
-coverart="albumart_backup"
+# 設定ファイルを読み込む関数
+load_config() {
+	if [ -e "${HOME}/.abcde.conf" ]; then
+		. "${HOME}/.abcde.conf"
+	elif [ -e "/etc/abcde.conf" ]; then
+		. /etc/abcde.conf
+	else
+		export ALBUMARTFILE="Folder.jpg"
+		export OUTPUTDIR="${PWD}"
+	fi
+}
 
-# ホームディレクトリに設定ファイルがあれば真
-if [ -e "${HOME}/.abcde.conf" ]; then
+# CDDBからデータを取得する関数
+fetch_cddb_data() {
+	local acquired_data
+	acquired_data="$(abcde -a cddb -N "${CDDB_TIMEOUT}" 2>&1)"
+	
+	if echo "${acquired_data}" | grep -q 'error "Not Found"'; then
+		echo "Error: CDデータがCDDBに見つかりません!" >&2
+		exit 1
+	fi
+}
 
-	# 設定ファイルの変数を読み込み
-	. "${HOME}/.abcde.conf"
+# カバーアートを処理する関数
+process_coverart() {
+	local coverart_dir
+	coverart_dir=$(find "${PWD}" -type d -name "${COVERART_DIRNAME}")
+	
+	if [ -n "${coverart_dir}" ]; then
+		mv "${coverart_dir}/${ALBUMARTFILE}" .
+		rmdir "${coverart_dir}" || true
+	fi
+}
 
-# /etc以下に設定ファイルがあれば真
-elif [ -e "/etc/abcde.conf" ]; then
+# メイン処理
+main() {
+	# 現在のディレクトリを保存
+	local PRE_DIR="${PWD}"
+	
+	# 設定ファイルを読み込み
+	load_config
+	
+	# 第一引数が指定されていればそのディレクトリに移動,なければOUTPUTDIRへ移動
+	cd "${1:-$OUTPUTDIR}"
+	
+	# CDDBからデータを取得
+	fetch_cddb_data
+	
+	# 非対話的に処理:取得したカバーアートをファイルに埋め込み,中間ファイルを生成しない
+	abcde -N -G -B -P -p -a cddb,encode,tag,move,clean
+	
+	# カバーアートを処理
+	process_coverart
+	
+	# 現在のディレクトリを元に戻す
+	cd "${PRE_DIR}"
+	
+	eject
+}
 
-	. /etc/abcde.conf
-
-else
-
-    # 設定ファイルが存在しない場合、初期値を設定
-	export ALBUMARTFILE="Folder.jpg"
-	# 現在のディレクトリ
-	export OUTPUTDIR="${PWD}"
-
-fi
-
-# 第一引数が指定されていればそのディレクトリに移動,なければOUTPUTDIRへ移動
-cd "${1:-$OUTPUTDIR}"
-
-# CDDBからデータを取得
-acquired_data="$(abcde -a cddb -N 2>&1)"
-
-# CDDBからデータを取得できなければ真
-if echo "${acquired_data}" | grep -q 'error "Not Found"'; then
-
-	# エラーメッセージを出力
-    echo "Error: CD data is not found for CDDB!" >&2
-    exit 1
-
-fi
-
-# 非対話的に処理:取得したカバーアートをファイルに埋め込み,中間ファイルを生成しない
-abcde -N -G -B -P -p -a cddb,encode,tag,move,clean
-
-# カバーアートのディレクトリを検索
-coverart_dir=$(find "${PWD}" -type d -name "${coverart}")
-
-# カバーアートのディレクトリが存在すれば真
-if [ -n "${coverart_dir}" ]; then
-
-	# カバーアートをカレントディレクトリに移動
-    mv "${coverart_dir}/${ALBUMARTFILE}" .
-    rmdir "${coverart_dir}" || true
-
-fi
-
-# 現在のディレクトリを元に戻す
-cd "${pre_dir}"
-
-eject
+# スクリプト実行
+main
 
