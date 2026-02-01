@@ -5,16 +5,35 @@ PORT=80
 HOST_DIR=""
 
 # オプション解析
-while getopts p:h opt; do
-	case "${opt}" in
-		p) PORT="${OPTARG}" ;;
-		h) echo "Usage: $0 [-p PORT] host_dir" 1>&2; exit 1 ;;
-		\?) echo "Invalid option: -${OPTARG}" 1>&2; exit 1 ;;
+while [ "${#}" -ne 0 ]; do
+	case "${1}" in
+		-p)
+			shift
+			if [ "${#}" -eq 0 ]; then
+				echo "Option -p requires an argument" 1>&2
+				exit 1
+			fi
+			PORT="${1}"
+			shift
+			;;
+		-h)
+			echo "Usage: ${0} [-p PORT] host_dir" 1>&2
+			exit 1
+			;;
+		-*)
+			echo "Invalid option: ${1}" 1>&2
+			exit 1
+			;;
+		*)
+			if [ -n "${HOST_DIR}" ]; then
+				echo "Too many non-option arguments" 1>&2
+				exit 1
+			fi
+			HOST_DIR="${1}"
+			shift
+			;;
 	esac
 done
-shift "$((OPTIND - 1))"
-
-HOST_DIR="${1}"
 
 # 引数の有無を確認,あれば真,なければ偽
 if [ -n "${HOST_DIR}" ] ; then
