@@ -7,50 +7,23 @@ export LANG=C
 export LC_ALL=C
 export POSIXLY_CORRECT=1
 
-# geminiとqwenとopencodeのいずれかがインストールされてれば真
-if command -v gemini > /dev/null 2>&1 && command -v qwen > /dev/null 2>&1 && command -v opencode > /dev/null 2>&1; then
+# 利用可能なAIツールをチェック
+check_tool() {
+	command -v "${1}" > /dev/null 2>&1 && printf '%s\n' "$1"
+}
 
-	# 3つのツールが全てインストールされている場合
-	ai_tool=$(printf "gemini\nqwen\nopencode\n" | fzf --layout=reverse --prompt=" AIツールを選択 > ")
-	test -z "${ai_tool}" && exit 1
+# 利用可能なツールのリストを作成
+available_tools=$(
+	check_tool gemini
+	check_tool qwen
+	check_tool opencode
+)
 
-# geminiとqwenのみインストールされている場合
-elif command -v gemini > /dev/null 2>&1 && command -v qwen > /dev/null 2>&1; then
+# 利用可能なツールの数をカウント
+tool_count=$(printf '%s' "${available_tools}" | grep -c '^' || true)
 
-	ai_tool=$(printf "gemini\nqwen\n" | fzf --layout=reverse --prompt=" AIツールを選択 > ")
-	test -z "${ai_tool}" && exit 1
-
-# geminiとopencodeのみインストールされている場合
-elif command -v gemini > /dev/null 2>&1 && command -v opencode > /dev/null 2>&1; then
-
-	ai_tool=$(printf "gemini\nopencode\n" | fzf --layout=reverse --prompt=" AIツールを選択 > ")
-	test -z "${ai_tool}" && exit 1
-
-# qwenとopencodeのみインストールされている場合
-elif command -v qwen > /dev/null 2>&1 && command -v opencode > /dev/null 2>&1; then
-
-	ai_tool=$(printf "qwen\nopencode\n" | fzf --layout=reverse --prompt=" AIツールを選択 > ")
-	test -z "${ai_tool}" && exit 1
-
-# geminiのみインストールされている場合
-elif command -v gemini > /dev/null 2>&1; then
-
-	ai_tool=gemini
-
-# qwenのみインストールされている場合
-elif command -v qwen > /dev/null 2>&1; then
-
-	ai_tool=qwen
-
-# opencodeのみインストールされている場合
-elif command -v opencode > /dev/null 2>&1; then
-
-	ai_tool=opencode
-
-# いずれもインストールされていない場合
-else
-
-	# AIツール選択メニュー
+# ツールがない場合はエラー
+if [ "${tool_count}" -eq 0 ]; then
 	cat <<- EOS >&2
 		gemini, qwen, opencode のいずれもインストールされていないか,PATHにありません
 		いずれかをインストールしてください
@@ -58,64 +31,57 @@ else
 		qwen の場合: npm install -g @qwen-code/qwen-code@latest
 		opencode の場合: curl -fsSL https://opencode.ai/install | bash
 	EOS
+	exit 1
+fi
 
-    exit 1
-
+# ツールが1つだけの場合は自動選択、複数ある場合はメニュー表示
+if [ "${tool_count}" -eq 1 ]; then
+	ai_tool=${available_tools}
+else
+	ai_tool=$(printf '%s' "${available_tools}" | fzf --layout=reverse --prompt=" AIツールを選択 > ")
+	test -z "${ai_tool}" && exit 1
 fi
 
 # メニュー項目の定義
-menu_items=$(cat <<- EOS
-1:git commitの作成
+menu_items="1:git commitの作成
 2:git commitの打ち消し
 3:git addされた変更をcommit
 4:READMEへの反映
-5:READMEを添削
-EOS
-)
+5:READMEを添削"
 
 # 選択処理
-selected=$(echo "${menu_items}" | fzf --layout=reverse --prompt=" ${ai_tool}: 操作を選択 > ")
+selected=$(printf '%s' "${menu_items}" | fzf --layout=reverse --prompt=" ${ai_tool}: 操作を選択 > ")
 # 変数展開で数値を抽出
 extracted="${selected%%:*}"
 
 # 選択処理で受け取った変数に応じプロンプトを変数に代入
 case "${extracted}" in
-
-    1)
-        message="gitから変更点を確認,ファイルごとにそれぞれ日本語で適切なコミットを作成してください.コミットの作成時に許可は不要です"
-        ;;
+	1)
+		message="gitから変更点を確認,ファイルごとにそれぞれ日本語で適切なコミットを作成してください.コミットの作成時に許可は不要です"
+		;;
 	2)
 		message="現在のgit commitをgit revertで打ち消してください.操作時に許可は不要です"
 		;;
 	3)
 		message="git addされたファイルを確認し日本語で適切なコミットを作成して下さい.操作時に許可は不要です"
 		;;
-    4)
-        message="gitの履歴を確認し必要であれば日本語で@README.mdに追記してください"
-        ;;
-    5)
-        message="@README.mdの内容を添削し変更点を日本語で別ファイルに書き出してください"
-        ;;
-    *)
-        exit 1
-        ;;
-
+	4)
+		message="gitの履歴を確認し必要であれば日本語で@README.mdに追記してください"
+		;;
+	5)
+		message="@README.mdの内容を添削し変更点を日本語で別ファイルに書き出してください"
+		;;
+	*)
+		exit 1
+		;;
 esac
 
 # 選択されたAIツールで実行
 case "${ai_tool}" in
-
-    gemini)
-        gemini --yolo -p "${message}"
-        ;;
-
-    qwen)
-        qwen --yolo -p "${message}"
-        ;;
-
-    opencode)
-        opencode run "${message}"
-        ;;
-
+	opencode)
+		exec opencode run "${message}"
+		;;
+	*)
+		exec "${ai_tool}" --yolo -p "${message}"
+		;;
 esac
-
