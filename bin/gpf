@@ -7,34 +7,56 @@ export LANG=C
 export LC_ALL=C
 export POSIXLY_CORRECT=1
 
-# geminiとqwenの両方がインストールされてれば真
-if command -v gemini > /dev/null 2>&1 && command -v qwen > /dev/null 2>&1; then
+# geminiとqwenとopencodeのいずれかがインストールされてれば真
+if command -v gemini > /dev/null 2>&1 && command -v qwen > /dev/null 2>&1 && command -v opencode > /dev/null 2>&1; then
 
-	# AIツール選択メニュー
-	ai_tool=$(printf "gemini\nqwen\n" | fzf --layout=reverse --prompt=" AIツールを選択 > ")
-
-	# AIツールを選択しなければ終了
+	# 3つのツールが全てインストールされている場合
+	ai_tool=$(printf "gemini\nqwen\nopencode\n" | fzf --layout=reverse --prompt=" AIツールを選択 > ")
 	test -z "${ai_tool}" && exit 1
 
-# geminiしかインストールされていなければ真
+# geminiとqwenのみインストールされている場合
+elif command -v gemini > /dev/null 2>&1 && command -v qwen > /dev/null 2>&1; then
+
+	ai_tool=$(printf "gemini\nqwen\n" | fzf --layout=reverse --prompt=" AIツールを選択 > ")
+	test -z "${ai_tool}" && exit 1
+
+# geminiとopencodeのみインストールされている場合
+elif command -v gemini > /dev/null 2>&1 && command -v opencode > /dev/null 2>&1; then
+
+	ai_tool=$(printf "gemini\nopencode\n" | fzf --layout=reverse --prompt=" AIツールを選択 > ")
+	test -z "${ai_tool}" && exit 1
+
+# qwenとopencodeのみインストールされている場合
+elif command -v qwen > /dev/null 2>&1 && command -v opencode > /dev/null 2>&1; then
+
+	ai_tool=$(printf "qwen\nopencode\n" | fzf --layout=reverse --prompt=" AIツールを選択 > ")
+	test -z "${ai_tool}" && exit 1
+
+# geminiのみインストールされている場合
 elif command -v gemini > /dev/null 2>&1; then
 
 	ai_tool=gemini
 
-# qwenしかインストールされていなければ真
+# qwenのみインストールされている場合
 elif command -v qwen > /dev/null 2>&1; then
 
 	ai_tool=qwen
+
+# opencodeのみインストールされている場合
+elif command -v opencode > /dev/null 2>&1; then
+
+	ai_tool=opencode
 
 # いずれもインストールされていない場合
 else
 
 	# AIツール選択メニュー
 	cat <<- EOS >&2
-		gemini または qwen がインストールされていないか,PATHにありません
+		gemini, qwen, opencode のいずれもインストールされていないか,PATHにありません
 		いずれかをインストールしてください
 		gemini の場合: npx https://github.com/google-gemini/gemini-cli または npm install -g @google/gemini-cli@latest
 		qwen の場合: npm install -g @qwen-code/qwen-code@latest
+		opencode の場合: curl -fsSL https://opencode.ai/install | bash
 	EOS
 
     exit 1
@@ -89,6 +111,10 @@ case "${ai_tool}" in
 
     qwen)
         qwen --yolo -p "${message}"
+        ;;
+
+    opencode)
+        opencode run "${message}"
         ;;
 
 esac
