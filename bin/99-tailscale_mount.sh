@@ -45,7 +45,7 @@ elif echo "${ap_name}" | grep -F -v -q "${home_ap}" ; then
 
 	tailscale up &&
 
-	systemctl restart rc-local.service
-
+	# 再マウント
+	mount -a
 fi
 
