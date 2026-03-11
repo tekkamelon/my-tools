@@ -36,20 +36,21 @@ while [ "${#}" -gt 0 ]; do
 			exit 0
 			;;
 		-*)
-			echo "Error: Unknown option: $1" >&2
+			echo "Error: Unknown option: ${1}" >&2
 			exit 1
 			;;
 		*)
-			echo "Error: Unexpected argument: $1" >&2
+			echo "Error: Unexpected argument: ${1}" >&2
 			exit 1
 			;;
 	esac
 
 done
 
+# 必要な引数が提供されているか確認
 if [ -z "${working_dir}" ] || [ -z "${go2rtc_host}" ]; then
 
-	echo "Usage: $0 -d <working_dir> -h <go2rtc_host>" >&2
+	echo "Usage: ${0} -d <working_dir> -h <go2rtc_host>" >&2
 	exit 1
 
 fi
