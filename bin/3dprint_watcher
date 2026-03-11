@@ -1,0 +1,40 @@
+#!/bin/sh
+
+set -eu
+
+# 変数を初期化
+working_dir=""
+go2rtc_host=""
+
+# 引数を解析
+while getopts "d:h:" opt; do
+	case "${opt}" in
+		d)
+			working_dir="${OPTARG}"
+			;;
+		h)
+			go2rtc_host="${OPTARG}"
+			;;
+		*)
+			echo "Usage: $0 -d <working_dir> -h <go2rtc_host>" >&2
+			exit 1
+			;;
+	esac
+done
+
+# 必要な引数が提供されているか確認
+if [ -z "${working_dir}" ] || [ -z "${go2rtc_host}" ]; then
+
+	echo "Usage: $0 -d <working_dir> -h <go2rtc_host>" >&2
+	exit 1
+
+fi
+
+# ワーキングディレクトリに移動
+cd "${working_dir}"
+
+# curlでgo2rtcのスナップショットを取得
+curl -s "http://${go2rtc_host}:1984/api/frame.jpeg?src=printer_cam" -o snapshot.jpg &&
+
+# qwenでスナップショットを判断
+qwen --yolo -p "@snapshot.jpg は3Dプリントの監視カメラからのもので、現在のプリント状態を判断してください。プリントが正常に進行している場合は「正常」と答え、問題がある場合は「問題あり」と答えてください。"
