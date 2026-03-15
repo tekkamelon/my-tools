@@ -13,9 +13,10 @@ Options:
     -h HOST    OctoPrint host (default: from OCTOPRINT_HOST env or localhost)
     -p PORT    OctoPrint port (default: from OCTOPRINT_PORT env or 80)
 Commands:
-    stop       Cancel the current print job
-    pause      Pause the current print job
-    resume     Resume the paused print job
+    status      Get current print job status
+    stop        Cancel the current print job
+    pause       Pause the current print job
+    resume      Resume the paused print job
 Environment variables:
     OCTOPRINT_API_KEY    API key for OctoPrint
     OCTOPRINT_HOST       Default host
@@ -56,8 +57,13 @@ API_KEY="${OCTOPRINT_API_KEY}"
 # コマンドの取得
 cmd="${1}"
 
-# コマンドに応じたペイロードの構築
+# コマンドに応じた処理の実行
 case "${cmd}" in
+    status)
+        # ステータス取得はGETリクエスト
+        curl -s -X GET "http://${HOST}:${PORT}/api/job" \
+            -H "X-Api-Key: ${API_KEY}"
+        ;;
     stop|cancel)
         payload='{"command":"cancel"}'
         ;;
@@ -74,8 +80,10 @@ case "${cmd}" in
         ;;
 esac
 
-# OctoPrint APIへのリクエスト実行
-curl -s -X POST "http://${HOST}:${PORT}/api/job" \
-    -H "Content-Type: application/json" \
-    -H "X-Api-Key: ${API_KEY}" \
-    -d "${payload}"
+# POSTリクエストの実行（statusコマンド以外）
+if [ "${cmd}" != "status" ]; then
+    curl -s -X POST "http://${HOST}:${PORT}/api/job" \
+        -H "Content-Type: application/json" \
+        -H "X-Api-Key: ${API_KEY}" \
+        -d "${payload}"
+fi
