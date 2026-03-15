@@ -1,0 +1,81 @@
+#!/bin/sh
+# OctoPrint ジョブ制御CLIツール
+set -eu
+
+# 改行とタブのみを区切り文字として扱う
+IFS=$(printf '\n\t')
+
+# 使用方法を表示する関数
+usage() {
+    cat <<'EOF'
+Usage: opcli [OPTIONS] COMMAND
+Options:
+    -h HOST    OctoPrint host (default: from OCTOPRINT_HOST env or localhost)
+    -p PORT    OctoPrint port (default: from OCTOPRINT_PORT env or 80)
+Commands:
+    stop       Cancel the current print job
+    pause      Pause the current print job
+    resume     Resume the paused print job
+Environment variables:
+    OCTOPRINT_API_KEY    API key for OctoPrint
+    OCTOPRINT_HOST       Default host
+    OCTOPRINT_PORT       Default port
+EOF
+}
+
+# デフォルト値の設定（環境変数または固定値）
+HOST="${OCTOPRINT_HOST:-localhost}"
+PORT="${OCTOPRINT_PORT:-80}"
+API_KEY=""
+
+# コマンドラインオプションの解析
+while getopts ":h:p:" opt; do
+    case "${opt}" in
+        h) HOST="${OPTARG}" ;;
+        p) PORT="${OPTARG}" ;;
+        :) printf 'Option -%s requires an argument\n' "${OPTARG}" >&2; exit 1 ;;
+        \?) printf 'Unknown option: -%s\n' "${OPTARG}" >&2; exit 1 ;;
+    esac
+done
+
+shift $((OPTIND - 1))
+
+# 引数がない場合は使用方法を表示して終了
+if [ ${#} -eq 0 ]; then
+    usage
+    exit 0
+fi
+
+# APIキーが環境変数に設定されていない場合はエラー
+if [ -z "${OCTOPRINT_API_KEY:-}" ]; then
+    printf 'Error: OCTOPRINT_API_KEY environment variable is not set\n' >&2
+    exit 1
+fi
+API_KEY="${OCTOPRINT_API_KEY}"
+
+# コマンドの取得
+cmd="${1}"
+
+# コマンドに応じたペイロードの構築
+case "${cmd}" in
+    stop|cancel)
+        payload='{"command":"cancel"}'
+        ;;
+    pause)
+        payload='{"command":"pause","action":"pause"}'
+        ;;
+    resume)
+        payload='{"command":"pause","action":"resume"}'
+        ;;
+    *)
+        printf 'Unknown command: %s\n' "${cmd}" >&2
+        usage
+        exit 1
+        ;;
+esac
+
+# OctoPrint APIへのリクエスト実行
+curl -s -X POST "http://${HOST}:${PORT}/api/job" \
+    -H "Content-Type: application/json" \
+    -H "X-Api-Key: ${API_KEY}" \
+    -d "${payload}"
