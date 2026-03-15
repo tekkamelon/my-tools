@@ -1,25 +1,57 @@
 #!/bin/sh
 
-# 引数が4つもしくは5つある場合は真,なければ偽
-if [ "${#}" = 4 ] || [ "${#}" = 5 ]; then
+# switchオプションの初期化
+switch=""
+# messageの初期化
+message=""
 
-	# 変数の宣言
+# 引数を1つずつ解析
+while [ "${#}" -gt 0 ]; do
+	case "${1}" in
+		-t)
+			# ping成功時に通知
+			switch="-t"
+			shift
+			;;
+		-f)
+			# ping失敗時に通知
+			switch="-f"
+			shift
+			;;
+		*)
+			# 最初の未知の引数をmessageとして保存
+			if [ -z "${message}" ]; then
+				message="${1}"
+			else
+				break
+			fi
+			shift
+			;;
+	esac
+done
+
+# 引数が4つ以上ある場合のみ実行
+if [ "${#}" -ge 4 ]; then
+
+	# 位置引数を変数に割り当て
 	ip_adress="${1}"
 	webhook_url="${2}"
 	bot_name="${3}"
 	message="${4}"
-	switch="${5}"
 
-	# 以降,変数が空の場合に中止
+	# switchが未設定の場合は第5引数を代入
+	if [ -z "$switch" ]; then
+		switch="${5:-}"
+	fi
+
+	# 以降,変数が空の場合はエラーで中止
 	set -ue
 
-	# 第5引数が"-t"もしくは空の場合は真,それ以外で偽
+	# "-t"または空の場合はping成功時に通知
 	if [ "${switch}" = "-t" ] || [ -z "${switch}" ] ; then
 
-		# 疎通確認できれば後続のコマンドを実行
 		ping "${ip_adress}" -c 3 &&
 
-		# 真の場合はcurlでdiscordのwebhookにメッセージをPOST
 		curl -X POST  "${webhook_url}" -H "Content-Type: application/json" -d @- <<-EOS
 			{
 
@@ -29,12 +61,11 @@ if [ "${#}" = 4 ] || [ "${#}" = 5 ]; then
 			}
 			EOS
 	
+	# "-f"の場合はping失敗時に通知
 	elif [ "${switch}" = "-f" ] ; then
 
-		# 疎通確認できなれけば後続のコマンドを実行
 		ping "${ip_adress}" -c 3 ||
 
-		# curlでdiscordのwebhookにメッセージをPOST
 		curl -X POST  "${webhook_url}" -H "Content-Type: application/json" -d @- <<-EOS
 			{
 
@@ -49,8 +80,7 @@ if [ "${#}" = 4 ] || [ "${#}" = 5 ]; then
 
 else
 
-	# 偽の場合はエラーメッセージを表示
-	echo "$0 ip_adress webhook_url bot_name message" 1>&2
+	# 引数が不足の場合は使用方法を出力
+	echo "$0 [-t|-f] ip_adress webhook_url bot_name message" 1>&2
 
 fi
-
