@@ -30,16 +30,25 @@ PORT="${OCTOPRINT_PORT:-80}"
 API_KEY=""
 
 # コマンドラインオプションの解析
-while getopts ":h:p:" opt; do
-    case "${opt}" in
-        h) HOST="${OPTARG}" ;;
-        p) PORT="${OPTARG}" ;;
-        :) printf 'Option -%s requires an argument\n' "${OPTARG}" >&2; exit 1 ;;
-        \?) printf 'Unknown option: -%s\n' "${OPTARG}" >&2; exit 1 ;;
+while [ "${#}" -gt 0 ]; do
+    case "${1}" in
+        -h)
+            HOST="${2}"
+            shift 2
+            ;;
+        -p)
+            PORT="${2}"
+            shift 2
+            ;;
+        -*)
+            printf 'Unknown option: %s\n' "${1}" >&2
+            exit 1
+            ;;
+        *)
+            break
+            ;;
     esac
 done
-
-shift $((OPTIND - 1))
 
 # 引数がない場合は使用方法を表示して終了
 if [ ${#} -eq 0 ]; then
