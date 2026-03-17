@@ -6,8 +6,9 @@ export LC_ALL=C
 export LANG=C
 export POSIXLY_CORRECT=1
 
-working_dir=""
-go2rtc_host=""
+# デフォルトの値
+working_dir="${PWD}"
+go2rtc_host="localhost"
 
 # 引数の解析
 while [ "${#}" -gt 0 ]; do
@@ -47,6 +48,16 @@ while [ "${#}" -gt 0 ]; do
 
 done
 
+# 作業ディレクトリに移動
+cd "${working_dir}"
+
+# 3Dプリントの監視カメラからのスナップショットを取得して保存
+if curl -s "http://${go2rtc_host}:1984/api/frame.jpeg?src=printer_cam" -o snapshot.jpg; then
+
+	qwen --yolo -p "@snapshot.jpg は3Dプリントの監視カメラからの画像です.これを用いて現在のプリント状態を判断してください.プリントが正常に進行している場合は特にアクションを起こす必要はありません.問題がある場合はopcliコマンドを適切に実行して下さい"
+
+else
+
 # 必要な引数が提供されているか確認
 if [ -z "${working_dir}" ] || [ -z "${go2rtc_host}" ]; then
 
@@ -54,12 +65,7 @@ if [ -z "${working_dir}" ] || [ -z "${go2rtc_host}" ]; then
 	exit 1
 
 fi
-
-# 作業ディレクトリに移動
-cd "${working_dir}"
-
-# 3Dプリントの監視カメラからのスナップショットを取得して保存
-curl -s "http://${go2rtc_host}:1984/api/frame.jpeg?src=printer_cam" -o snapshot.jpg &&
-
-qwen --yolo -p "@snapshot.jpg は3Dプリントの監視カメラからの画像です.これを用いて現在のプリント状態を判断してください.プリントが正常に進行している場合は特にアクションを起こす必要はありません.問題がある場合はopcliコマンドを適切に実行して下さい"
+	echo "Error: Failed to fetch snapshot from ${go2rtc_host}" >&2
+	exit 1
+fi
 
