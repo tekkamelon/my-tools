@@ -3,7 +3,7 @@
 
 set -eu
 
-# 環境変数設定
+# ====== 変数の設定 ======
 export LC_ALL=C
 export LANG=C
 export POSIXLY_CORRECT=1
@@ -30,7 +30,10 @@ else
 	exit 1
 
 fi
+# ====== 変数の設定ここまで ======
 
+
+# ====== 関数の設定 ======
 # GETリクエストを実行する関数
 http_get() {
 
@@ -96,7 +99,10 @@ usage() {
 	  OCTOPRINT_PORT       Default port
 	EOF
 }
+# ====== 関数の設定ここまで ======
 
+
+# ====== メイン処理 ======
 # コマンドラインオプションの解析
 while [ "${#}" -gt 0 ]; do
 
@@ -173,4 +179,4 @@ if [ "${cmd}" != "status" ]; then
     http_post "http://${HOST}:${PORT}/api/job" "${API_KEY}" "${payload}"
 
 fi
-
+# ====== メイン処理ここまで ======
