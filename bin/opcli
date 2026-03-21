@@ -15,6 +15,66 @@ API_KEY=""
 # 改行とタブのみを区切り文字として扱う
 IFS=$(printf '\n\t')
 
+# ダウンローダ検出
+if command -v wget >/dev/null 2>&1; then
+
+	downloader="wget"
+
+elif command -v curl >/dev/null 2>&1; then
+
+	downloader="curl"
+
+else
+
+	printf 'Error: please install "wget" or "curl"\n' >&2
+	exit 1
+
+fi
+
+# GETリクエストを実行する関数
+http_get() {
+
+	url="${1}"
+	api_key="${2}"
+
+	case "${downloader}" in
+
+		wget)
+			wget -q -O - --header="X-Api-Key: ${api_key}" "${url}"
+			;;
+		curl)
+			curl -s -X GET "${url}" -H "X-Api-Key: ${api_key}"
+			;;
+	esac
+
+}
+
+# POSTリクエストを実行する関数
+http_post() {
+
+	url="${1}"
+	api_key="${2}"
+	data="${3}"
+
+	case "${downloader}" in
+
+		wget)
+			wget -q -O - \
+				--post-data="${data}" \
+				--header="Content-Type: application/json" \
+				--header="X-Api-Key: ${api_key}" \
+				"${url}"
+			;;
+		curl)
+			curl -s -X POST "${url}" \
+				-H "Content-Type: application/json" \
+				-H "X-Api-Key: ${api_key}" \
+				-d "${data}"
+			;;
+	esac
+
+}
+
 # 使用方法を表示する関数
 usage() {
     cat <<- EOF
@@ -77,6 +137,7 @@ if [ -z "${OCTOPRINT_API_KEY:-}" ]; then
     exit 1
 
 fi
+
 API_KEY="${OCTOPRINT_API_KEY}"
 
 # コマンドの取得
@@ -87,8 +148,7 @@ case "${cmd}" in
 
     status)
         # ステータス取得はGETリクエスト
-        curl -s -X GET "http://${HOST}:${PORT}/api/job" \
-            -H "X-Api-Key: ${API_KEY}"
+        http_get "http://${HOST}:${PORT}/api/job" "${API_KEY}"
         ;;
     stop|cancel)
         payload='{"command":"cancel"}'
@@ -110,10 +170,7 @@ esac
 # POSTリクエストの実行（statusコマンド以外）
 if [ "${cmd}" != "status" ]; then
 
-    curl -s -X POST "http://${HOST}:${PORT}/api/job" \
-        -H "Content-Type: application/json" \
-        -H "X-Api-Key: ${API_KEY}" \
-        -d "${payload}"
+    http_post "http://${HOST}:${PORT}/api/job" "${API_KEY}" "${payload}"
 
 fi
 
