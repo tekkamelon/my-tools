@@ -1,8 +1,10 @@
 #!/bin/sh
 
 set -eu
+set -xv
 
 # ====== 変数の設定 ======
+export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 export LC_ALL=C
 export LANG=C
 export POSIXLY_CORRECT=1

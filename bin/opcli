@@ -4,6 +4,7 @@
 set -eu
 
 # ====== 変数の設定 ======
+. ~/.env
 export LC_ALL=C
 export LANG=C
 export POSIXLY_CORRECT=1
