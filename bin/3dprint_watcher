@@ -2,12 +2,20 @@
 
 set -eu
 
+# ====== 変数の設定 ======
 export LC_ALL=C
 export LANG=C
 export POSIXLY_CORRECT=1
 
+working_dir="${PWD}"
+go2rtc_host="localhost"
+# ====== 変数の設定ここまで ======
+
+
+# ====== 関数の設定 ======
 # ヘルプメッセージを表示する関数
 show_help() {
+
 	cat <<- EOF
 	Usage: 3dprint_watcher [options]
 
@@ -19,12 +27,12 @@ show_help() {
 	Examples:
 	  3dprint_watcher -d /tmp -h 192.168.1.100
 	EOF
+
 }
+# ====== 関数の設定ここまで ======
 
-# デフォルトの値
-working_dir="${PWD}"
-go2rtc_host="localhost"
 
+# ====== メイン処理 ======
 # 引数がない場合はヘルプを表示
 if [ "${#}" -eq 0 ]; then
 
@@ -64,23 +72,17 @@ done
 # 作業ディレクトリに移動
 cd "${working_dir}"
 
-# 3Dプリントの監視カメラからのスナップショットを取得して保存
+# スナップショット画像を取得
 if curl -s "http://${go2rtc_host}:1984/api/frame.jpeg?src=printer_cam" -o snapshot.jpg; then
 
+	# 取得した画像をAIで分析
 	qwen --yolo -p "@snapshot.jpg は3Dプリントの監視カメラからの画像です.これを用いて現在のプリント状態を判断してください.プリントが正常に進行している場合は特にアクションを起こす必要はありません.問題がある場合はopcliコマンドを適切に実行して下さい"
 
 else
 
-# 必要な引数が提供されているか確認
-if [ -z "${working_dir}" ] || [ -z "${go2rtc_host}" ]; then
-
-	echo "Usage: ${0} -d <working_dir> -h <go2rtc_host>" >&2
-	exit 1
-
-fi
-
+	# エラーメッセージを表示して終了
 	echo "Error: Failed to fetch snapshot from ${go2rtc_host}" >&2
 	exit 1
 
 fi
-
+# ====== メイン処理ここまで ======
