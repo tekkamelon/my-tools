@@ -6,9 +6,32 @@ export LC_ALL=C
 export LANG=C
 export POSIXLY_CORRECT=1
 
+# ヘルプメッセージを表示する関数
+show_help() {
+	cat <<- EOF
+	Usage: 3dprint_watcher [options]
+
+	Options:
+	  -d <working_dir>  Working directory for the snapshot
+	  -h <go2rtc_host>  go2rtc host IP address
+	  --help            Show this help message and exit
+
+	Examples:
+	  3dprint_watcher -d /tmp -h 192.168.1.100
+	EOF
+}
+
 # デフォルトの値
 working_dir="${PWD}"
 go2rtc_host="localhost"
+
+# 引数がない場合はヘルプを表示
+if [ "${#}" -eq 0 ]; then
+
+	show_help
+	exit 0
+
+fi
 
 # 引数の解析
 while [ "${#}" -gt 0 ]; do
@@ -23,17 +46,7 @@ while [ "${#}" -gt 0 ]; do
 			shift 2
 			;;
 		--help)
-			cat <<- EOF
-			Usage: 3dprint_watcher [options]
-
-			Options:
-			  -d <working_dir>  Working directory for the snapshot
-			  -h <go2rtc_host>  go2rtc host IP address
-			  --help            Show this help message and exit
-
-			Examples:
-			  3dprint_watcher -d /tmp -h 192.168.1.100
-			EOF
+			show_help
 			exit 0
 			;;
 		-*)
@@ -65,7 +78,9 @@ if [ -z "${working_dir}" ] || [ -z "${go2rtc_host}" ]; then
 	exit 1
 
 fi
+
 	echo "Error: Failed to fetch snapshot from ${go2rtc_host}" >&2
 	exit 1
+
 fi
 
