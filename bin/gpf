@@ -17,6 +17,7 @@ available_tools=$(
 	check_tool gemini
 	check_tool qwen
 	check_tool opencode
+	check_tool kilocode
 )
 
 # 利用可能なツールの数をカウント
@@ -25,11 +26,12 @@ tool_count=$(printf '%s' "${available_tools}" | grep -c '^' || true)
 # ツールがない場合はエラー
 if [ "${tool_count}" -eq 0 ]; then
 	cat <<- EOS >&2
-		gemini, qwen, opencode のいずれもインストールされていないか,PATHにありません
+		gemini, qwen, opencode kilocode のいずれもインストールされていないか,PATHにありません
 		いずれかをインストールしてください
-		gemini の場合: npx https://github.com/google-gemini/gemini-cli または npm install -g @google/gemini-cli@latest
-		qwen の場合: npm install -g @qwen-code/qwen-code@latest
-		opencode の場合: curl -fsSL https://opencode.ai/install | bash
+		gemini : npx https://github.com/google-gemini/gemini-cli または npm install -g @google/gemini-cli@latest
+		qwen : npm install -g @qwen-code/qwen-code@latest
+		opencode : curl -fsSL https://opencode.ai/install | bash
+		kilocode : npm install -g @kilocode/cli
 	EOS
 	exit 1
 fi
@@ -80,6 +82,9 @@ esac
 case "${ai_tool}" in
 	opencode)
 		exec opencode run "${message}"
+		;;
+	kilocode)
+		exec kilocode run "${message}"
 		;;
 	*)
 		exec "${ai_tool}" --yolo -p "${message}"
