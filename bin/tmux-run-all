@@ -1,0 +1,59 @@
+#!/bin/sh
+
+# スクリプトの実行オプションを設定
+set -u
+
+# 引数が指定されていない場合のエラーメッセージを表示
+if [ ${#} -eq 0 ]; then
+
+    echo "Usage: $(basename "$0") <command> [args...]" >&2
+    exit 1
+
+fi
+
+# tmuxコマンドが利用可能かチェック
+command -v tmux >/dev/null 2>&1 || {
+
+    echo "Error: tmux is not installed" >&2
+    exit 1
+
+}
+
+# アクティブなtmuxセッションのリストを取得
+tmux_list="$(tmux ls 2>/dev/null)" || tmux_list=""
+
+# アクティブなセッションがない場合のエラーメッセージを表示
+if [ -z "${tmux_list}" ]; then
+
+    echo "No active tmux sessions" >&2
+    exit 1
+
+fi
+
+# 実行するコマンドを引数から取得
+command_to_run="${*}"
+
+# セッション名のリストを取得
+tmux_list="$(tmux ls -F '#{session_name}' 2>/dev/null)" || exit 1
+
+# セッションが存在しない場合は終了
+if [ -z "${tmux_list}" ]; then
+
+    exit 0
+
+fi
+
+# 各セッションに対して処理を実行
+for session in ${tmux_list}; do
+
+    # セッション内のペインIDを取得,エラーが発生した場合は次のセッションに進む
+    panes="$(tmux list-panes -s -t "${session}" -F '#{pane_id}' 2>/dev/null)" || continue
+
+    # 各ペインに対してコマンドを送信
+    for pane in ${panes}; do
+
+        tmux send-keys -t "${pane}" "${command_to_run}" Enter
+
+    done
+
+done
