@@ -13,10 +13,10 @@ COVERART_DIRNAME="albumart_backup"
 
 # 設定ファイルを読み込む関数
 load_config() {
-	if [ -e "${HOME}/.abcde.conf" ]; then
-		. "${HOME}/.abcde.conf"
-	elif [ -e "/etc/abcde.conf" ]; then
-		. /etc/abcde.conf
+	if [ -f "${HOME}/.abcde.conf" ]; then
+		. "${HOME}/.abcde.conf" || true
+	elif [ -f "/etc/abcde.conf" ]; then
+		. /etc/abcde.conf || true
 	else
 		export ALBUMARTFILE="Folder.jpg"
 		export OUTPUTDIR="${PWD}"
@@ -25,18 +25,16 @@ load_config() {
 
 # CDDBからデータを取得する関数
 fetch_cddb_data() {
-	local acquired_data
-	acquired_data="$(abcde -a cddb -N "${CDDB_TIMEOUT}" 2>&1)"
-	
-	if echo "${acquired_data}" | grep -q 'error "Not Found"'; then
-		echo "Error: CDデータがCDDBに見つかりません!" >&2
+	acquired_data="$(abcde -a cddb -N "${CDDB_TIMEOUT}" 2>&1)" || true
+
+	if printf '%s' "${acquired_data}" | grep -q 'error "Not Found"'; then
+		printf '%s\n' "Error: CDデータがCDDBに見つかりません!" >&2
 		exit 1
 	fi
 }
 
 # カバーアートを処理する関数
 process_coverart() {
-	local coverart_dir
 	coverart_dir=$(find "${PWD}" -type d -name "${COVERART_DIRNAME}")
 	
 	if [ -n "${coverart_dir}" ]; then
@@ -48,7 +46,7 @@ process_coverart() {
 # メイン処理
 main() {
 	# 現在のディレクトリを保存
-	local PRE_DIR="${PWD}"
+	PRE_DIR="${PWD}"
 	
 	# 設定ファイルを読み込み
 	load_config
