@@ -2,7 +2,7 @@
 
 # shellcheck disable=SC1091
 
-set -euxv
+set -eux
 
 export LC_ALL=C
 export LANG=C
@@ -36,9 +36,9 @@ fetch_cddb_data() {
 # カバーアートを処理する関数
 process_coverart() {
 	coverart_dir=$(find "${PWD}" -type d -name "${COVERART_DIRNAME}")
-	
+
 	if [ -n "${coverart_dir}" ]; then
-		mv "${coverart_dir}/${ALBUMARTFILE}" .
+		mv "${coverart_dir}/${ALBUMARTFILE}" "${PWD}/"
 		rmdir "${coverart_dir}" || true
 	fi
 }
@@ -75,5 +75,5 @@ main() {
 }
 
 # スクリプト実行
-main "$@"
+main "${@}"
 
