@@ -2,7 +2,7 @@
 
 # shellcheck disable=SC1091
 
-set -eu
+set -euxv
 
 export LC_ALL=C
 export LANG=C
@@ -47,28 +47,33 @@ process_coverart() {
 main() {
 	# 現在のディレクトリを保存
 	PRE_DIR="${PWD}"
-	
+
 	# 設定ファイルを読み込み
 	load_config
-	
-	# 第一引数が指定されていればそのディレクトリに移動,なければOUTPUTDIRへ移動
-	cd "${1:-$OUTPUTDIR}"
-	
+
+	# 第一引数が指定されていればOUTPUTDIRをそのディレクトリに設定
+	if [ -n "${1}" ]; then
+		export OUTPUTDIR="${1}"
+	fi
+
+	# OUTPUTDIRに移動
+	cd "${OUTPUTDIR}"
+
 	# CDDBからデータを取得
 	fetch_cddb_data
-	
+
 	# 非対話的に処理:取得したカバーアートをファイルに埋め込み,中間ファイルを生成しない
 	abcde -N -G -B -P -p -a cddb,encode,tag,move,clean
-	
+
 	# カバーアートを処理
 	process_coverart
-	
+
 	# 現在のディレクトリを元に戻す
 	cd "${PRE_DIR}"
-	
+
 	eject
 }
 
 # スクリプト実行
-main
+main "$@"
 
