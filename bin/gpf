@@ -26,7 +26,7 @@ tool_count=$(printf '%s' "${available_tools}" | grep -c '^' || true)
 # ツールがない場合はエラー
 if [ "${tool_count}" -eq 0 ]; then
 	cat <<- EOS >&2
-		gemini, qwen, opencode kilocode のいずれもインストールされていないか,PATHにありません
+		コーディングエージェントがインストールされていないか,PATHにありません
 		いずれかをインストールしてください
 		gemini : npx https://github.com/google-gemini/gemini-cli または npm install -g @google/gemini-cli@latest
 		qwen : npm install -g @qwen-code/qwen-code@latest
