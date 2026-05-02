@@ -11,69 +11,47 @@ export LANG=C
 CDDB_TIMEOUT=2
 COVERART_DIRNAME="albumart_backup"
 
-# 設定ファイルを読み込む関数
-load_config() {
-	if [ -f "${HOME}/.abcde.conf" ]; then
-		. "${HOME}/.abcde.conf" || true
-	elif [ -f "/etc/abcde.conf" ]; then
-		. /etc/abcde.conf || true
-	else
-		export ALBUMARTFILE="Folder.jpg"
-		export OUTPUTDIR="${PWD}"
-	fi
-}
+# 現在のディレクトリを保存
+PRE_DIR="${PWD}"
 
-# CDDBからデータを取得する関数
-fetch_cddb_data() {
-	acquired_data="$(abcde -a cddb -N "${CDDB_TIMEOUT}" 2>&1)" || true
+# 設定ファイルを読み込み
+if [ -f "${HOME}/.abcde.conf" ]; then
+	. "${HOME}/.abcde.conf" || true
+elif [ -f "/etc/abcde.conf" ]; then
+	. /etc/abcde.conf || true
+else
+	export ALBUMARTFILE="Folder.jpg"
+	export OUTPUTDIR="${PWD}"
+fi
 
-	if printf '%s' "${acquired_data}" | grep -q 'error "Not Found"'; then
-		printf '%s\n' "Error: CDデータがCDDBに見つかりません!" >&2
-		exit 1
-	fi
-}
+# 第一引数が指定されていればOUTPUTDIRをそのディレクトリに設定
+if [ -n "${1}" ]; then
+	export OUTPUTDIR="${1}"
+fi
 
-# カバーアートを処理する関数
-process_coverart() {
-	coverart_dir=$(find "${PWD}" -type d -name "${COVERART_DIRNAME}")
+# OUTPUTDIRに移動
+cd "${OUTPUTDIR}"
 
-	if [ -n "${coverart_dir}" ]; then
-		mv "${coverart_dir}/${ALBUMARTFILE}" "${PWD}/"
-		rmdir "${coverart_dir}" || true
-	fi
-}
+# CDDBからデータを取得
+acquired_data="$(abcde -a cddb -N "${CDDB_TIMEOUT}" 2>&1)" || true
 
-# メイン処理
-main() {
-	# 現在のディレクトリを保存
-	PRE_DIR="${PWD}"
+if printf '%s' "${acquired_data}" | grep -q 'error "Not Found"'; then
+	printf '%s\n' "Error: CDデータがCDDBに見つかりません!" >&2
+	exit 1
+fi
 
-	# 設定ファイルを読み込み
-	load_config
+# 非対話的に処理:取得したカバーアートをファイルに埋め込み,中間ファイルを生成しない
+abcde -N -G -B -P -p -a cddb,encode,tag,move,clean
 
-	# 第一引数が指定されていればOUTPUTDIRをそのディレクトリに設定
-	if [ -n "${1}" ]; then
-		export OUTPUTDIR="${1}"
-	fi
+# カバーアートを処理
+coverart_dir=$(find "${PWD}" -type d -name "${COVERART_DIRNAME}")
 
-	# OUTPUTDIRに移動
-	cd "${OUTPUTDIR}"
+if [ -n "${coverart_dir}" ]; then
+	mv "${coverart_dir}/${ALBUMARTFILE}" "${PWD}/"
+	rmdir "${coverart_dir}" || true
+fi
 
-	# CDDBからデータを取得
-	fetch_cddb_data
+# 現在のディレクトリを元に戻す
+cd "${PRE_DIR}"
 
-	# 非対話的に処理:取得したカバーアートをファイルに埋め込み,中間ファイルを生成しない
-	abcde -N -G -B -P -p -a cddb,encode,tag,move,clean
-
-	# カバーアートを処理
-	process_coverart
-
-	# 現在のディレクトリを元に戻す
-	cd "${PRE_DIR}"
-
-	eject
-}
-
-# スクリプト実行
-main "${@}"
-
+eject
