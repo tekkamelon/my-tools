@@ -18,6 +18,7 @@ available_tools=$(
 	check_tool qwen
 	check_tool opencode
 	check_tool kilocode
+	check_tool goose
 )
 
 # 利用可能なツールの数をカウント
@@ -32,6 +33,7 @@ if [ "${tool_count}" -eq 0 ]; then
 		qwen : npm install -g @qwen-code/qwen-code@latest
 		opencode : curl -fsSL https://opencode.ai/install | bash
 		kilocode : npm install -g @kilocode/cli
+		goose : curl -fsSL https://github.com/aaif-goose/goose/releases/download/stable/download_cli.sh | bash
 	EOS
 	exit 1
 fi
@@ -85,6 +87,9 @@ case "${ai_tool}" in
 		;;
 	kilocode)
 		exec kilocode run "${message}"
+		;;
+	goose)
+		goose run --no-session -t "${message}"
 		;;
 	*)
 		exec "${ai_tool}" --yolo -p "${message}"
