@@ -1,11 +1,24 @@
-#!/bin/sh 
+#!/bin/sh
 
 set -eu
 
-: "${DISPLAY=:0}" ;
-# "${PULSE_SERVER=unix:/run/user/$(id -u)/pulse/native}" ;
-export DISPLAY ;
-# export PULSE_SERVER ;
-notify-send -t 3000 -u critical '🤖' 'タスク完了' ;
-paplay /usr/share/sounds/freedesktop/stereo/complete.oga
+: "${DISPLAY:=:0}"
+export DISPLAY
 
+# 通知は失敗しても処理全体は継続
+if command -v notify-send >/dev/null 2>&1; then
+
+    notify-send -t 3000 -u critical '🤖' 'タスク完了' >/dev/null 2>&1 || true
+
+fi
+
+# PulseAudio/PipeWire のソケットが存在する場合のみ再生を試行
+xdg_runtime_dir="${XDG_RUNTIME_DIR:-/run/user/$(id -u)}"
+pulse_socket="${xdg_runtime_dir}/pulse/native"
+sound_file='/usr/share/sounds/freedesktop/stereo/complete.oga'
+
+if [ -S "${pulse_socket}" ] && command -v paplay >/dev/null 2>&1 && [ -r "${sound_file}" ]; then
+
+    PULSE_SERVER="unix:${pulse_socket}" paplay "${sound_file}" >/dev/null 2>&1 || true
+
+fi
