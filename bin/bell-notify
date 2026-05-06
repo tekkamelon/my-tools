@@ -1,0 +1,11 @@
+#!/bin/sh 
+
+set -eu
+
+: "${DISPLAY=:0}" ;
+# "${PULSE_SERVER=unix:/run/user/$(id -u)/pulse/native}" ;
+export DISPLAY ;
+# export PULSE_SERVER ;
+notify-send -t 3000 -u critical '🤖' 'タスク完了' ;
+paplay /usr/share/sounds/freedesktop/stereo/complete.oga
+
