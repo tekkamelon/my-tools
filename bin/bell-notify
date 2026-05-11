@@ -2,21 +2,27 @@
 
 set -eu
 
-: "${DISPLAY:=:0}"
-export DISPLAY
+# ====== 変数の宣言 ======
+export POSIXLY_CORRECT=1
 
-# 通知は失敗しても処理全体は継続
-if command -v notify-send >/dev/null 2>&1; then
-
-    notify-send -t 3000 -u critical '🤖' 'タスク完了' >/dev/null 2>&1 || true
-
-fi
-
-# PulseAudio/PipeWire のソケットが存在する場合のみ再生を試行
+# PulseAudio/PipeWire ソケット存在時のみ再生
 xdg_runtime_dir="${XDG_RUNTIME_DIR:-/run/user/$(id -u)}"
 pulse_socket="${xdg_runtime_dir}/pulse/native"
 sound_file='/usr/share/sounds/freedesktop/stereo/complete.oga'
 
+: "${DISPLAY:=:0}"
+export DISPLAY
+# ====== 変数の宣言ここまで ======
+
+
+# 通知失敗時も処理継続
+if command -v notify-send >/dev/null 2>&1; then
+
+    notify-send -t 3000 -u critical '通知' 'タスク完了' >/dev/null 2>&1 || true
+
+fi
+
+# ベル音
 if [ -S "${pulse_socket}" ] && command -v paplay >/dev/null 2>&1 && [ -r "${sound_file}" ]; then
 
     PULSE_SERVER="unix:${pulse_socket}" paplay "${sound_file}" >/dev/null 2>&1 || true
