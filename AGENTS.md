@@ -21,6 +21,8 @@
 - web検索で調査して構いません
     - tool
     - MCP
+    - Skills
+        - `gemini-cli-bridge`
 - 調査結果を`markdown`形式で出力
 
 ### コードの書式
@@ -32,15 +34,10 @@
 
 #### シェルスクリプト
 
-- Skillsの`posix-shell`があればそちらを参照
-- 特別な指示がなければ可能な限り以下の条件に従うこと
-    - POSIX準拠のコマンドを使用
-    - bashismを使用しない
-    - 変数
-        - 変数の宣言時に`local`を使用しない
-        - 環境変数のみ大文字で宣言
-        - 通常の変数はすべて小文字で宣言
-        - 変数を呼び出す際は`"${example}"`のように記述
+- Skillsがあればそちらを参照
+
+    - `posix-shell`
+    - `my-shellscript-rules`
     
 #### Python
 
@@ -49,7 +46,7 @@
 ### テスト
 
 - HTML/cgi
-    - playwright mcpを使用
+    - playwrightを使用
     - 明示されない場合のURL
         - ホスト名:`localhost`
         - ポート番号:`80`
