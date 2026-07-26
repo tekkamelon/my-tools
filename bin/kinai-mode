@@ -1,0 +1,42 @@
+#!/bin/sh 
+
+set -eu
+
+# ====== 変数の宣言 ======
+# ロケールの設定
+export LC_ALL=C
+export LANG=C
+
+# wi-fiの状態を確認
+wifi_status=$(nmcli -f WIFI g | awk 'NR == 2')
+# bluetoothの状態を確認
+bluetooth_status=$(bluetooth | cut -d" " -f3)
+# ====== 変数の宣言ここまで ======
+
+
+
+# "wifi_status"が"enabled"であれば真
+if [ "${wifi_status}" = "enabled" ]; then
+
+	# wifiを切る
+	nmcli radio wifi off &&
+    notify-send -t 3000 -u critical '通知' 'wi-fiをOFFにしました' >/dev/null 2>&1 || true
+
+else
+
+    notify-send -t 3000 -u critical '通知' 'wi-fiは既にOFFです' >/dev/null 2>&1 || true
+
+fi
+
+# "bluetooth_status"が"on"であれば真
+if [ "${bluetooth_status}" = "on" ]; then
+
+	# bluetoothを切る
+	bluetooth off &&
+    notify-send -t 3000 -u critical '通知' 'bluetoothをOFFにしました' >/dev/null 2>&1 || true
+
+else
+
+    notify-send -t 3000 -u critical '通知' 'bluetoothは既にOFFです' >/dev/null 2>&1 || true
+
+fi
