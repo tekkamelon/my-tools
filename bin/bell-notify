@@ -18,7 +18,7 @@ export DISPLAY
 # 通知失敗時も処理継続
 if command -v notify-send >/dev/null 2>&1; then
 
-    notify-send -t 3000 -u critical '通知' 'タスク完了' >/dev/null 2>&1 || true
+    notify-send -t 3000 -u normal '通知' 'タスク完了' >/dev/null 2>&1 || true
 
 fi
 
