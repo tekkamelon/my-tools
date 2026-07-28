@@ -1,4 +1,4 @@
-#!/bin/sh 
+#!/bin/sh
 
 set -eu
 
@@ -7,24 +7,25 @@ set -eu
 export LC_ALL=C
 export LANG=C
 
-# wi-fiの状態を確認
-wifi_status=$(nmcli -f WIFI g | awk 'NR == 2')
+# wi-fiの状態を確認（末尾スペース除去）
+wifi_status=$(nmcli -f WIFI g | awk 'NR == 2' | tr -d '[:space:]')
 # bluetoothの状態を確認
-bluetooth_status=$(bluetooth | cut -d" " -f3)
+bluetooth_status=$(bluetooth | cut -d" " -f3 | tr -d '[:space:]')
+# このファイル自身のファイル名を取得
+basename=$(basename "$0")
 # ====== 変数の宣言ここまで ======
-
 
 
 # "wifi_status"が"enabled"であれば真
 if [ "${wifi_status}" = "enabled" ]; then
 
 	# wifiを切る
-	nmcli radio wifi off &&
-    notify-send -t 3000 -u critical '通知' 'wi-fiをOFFにしました' >/dev/null 2>&1 || true
+	nmcli radio wifi off || true
+	notify-send -t 3000 -u normal "${basename}" 'wi-fiをOFFにしました' >/dev/null 2>&1 || true
 
 else
 
-    notify-send -t 3000 -u critical '通知' 'wi-fiは既にOFFです' >/dev/null 2>&1 || true
+    notify-send -t 3000 -u normal "${basename}" 'wi-fiは既にOFFです' >/dev/null 2>&1 || true
 
 fi
 
@@ -33,10 +34,10 @@ if [ "${bluetooth_status}" = "on" ]; then
 
 	# bluetoothを切る
 	bluetooth off &&
-    notify-send -t 3000 -u critical '通知' 'bluetoothをOFFにしました' >/dev/null 2>&1 || true
+	notify-send -t 3000 -u normal "${basename}" 'bluetoothをOFFにしました' >/dev/null 2>&1 || true
 
 else
 
-    notify-send -t 3000 -u critical '通知' 'bluetoothは既にOFFです' >/dev/null 2>&1 || true
+	notify-send -t 3000 -u normal "${basename}" 'bluetoothは既にOFFです' >/dev/null 2>&1 || true
 
 fi
