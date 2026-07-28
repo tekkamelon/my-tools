@@ -17,13 +17,19 @@
 
 ### 調査
 
-- 複数の言語で調査して構いません
-- web検索で調査して構いません
+- 複数の言語での調査も可
+- web検索の方法
     - tool
-    - MCP
-    - Skills
-        - `gemini-cli-bridge`
-- 調査結果を`markdown`形式で出力
+    - MCPにより提供されるツール
+    - シェルコマンド
+        - `curl`
+        - `wget`
+        - `w3m -dump`
+- webでの調査でサイトへアクセスできない場合
+    - `r.jina.ai`を使用
+        - [Usage 1] https://r.jina.ai/YOUR_URL
+        - [Usage 2] https://s.jina.ai/YOUR_SEARCH_QUERY
+        - [Homepage] https://jina.ai/reader
 
 ### コードの書式
 
@@ -34,7 +40,7 @@
 
 #### シェルスクリプト
 
-- Skillsがあればそちらを参照
+- Skills
 
     - `posix-shell`
     - `my-shellscript-rules`
@@ -50,6 +56,10 @@
     - 明示されない場合のURL
         - ホスト名:`localhost`
         - ポート番号:`80`
+
+- Skills
+
+    - `playwright-cgi-html`
 
 ### git
 
