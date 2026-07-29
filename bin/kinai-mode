@@ -7,10 +7,12 @@ set -eu
 export LC_ALL=C
 export LANG=C
 
-# wi-fiの状態を確認（末尾スペース除去）
-wifi_status=$(nmcli -f WIFI g | awk 'NR == 2' | tr -d '[:space:]')
-# bluetoothの状態を確認
-bluetooth_status=$(bluetooth | cut -d" " -f3 | tr -d '[:space:]')
+export POSIXLY_CORRECT=1
+
+# wi-fiの状態を確認(空白除去)
+wifi_status=$(nmcli -f WIFI g | awk 'NR == 2 {gsub(/[[:space:]]/,""); print}')
+# bluetoothの状態を確認(空白除去)
+bluetooth_status=$(bluetooth | awk '{gsub(/[[:space:]]/,"",$3); print $3}')
 # このファイル自身のファイル名を取得
 basename=$(basename "$0")
 # ====== 変数の宣言ここまで ======
