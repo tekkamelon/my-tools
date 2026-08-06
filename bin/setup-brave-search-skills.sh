@@ -8,7 +8,6 @@ set -eu
 BRAVE_SKILLS_URL="https://github.com/brave/brave-search-skills/archive/main.tar.gz"
 SKILLS_DIR="${HOME}/.agents/skills"
 BX_INSTALL_DIR="${HOME}/.local/bin"
-TMP_DIR=""
 
 # 環境変数から API key を取得
 BRAVE_API_KEY="${BRAVE_API_KEY:-}"
@@ -52,12 +51,6 @@ print_ok() {
     printf '[OK] %s\n' "$*"
 }
 
-# 一時ディレクトリの削除
-cleanup() {
-    if [ -n "${TMP_DIR}" ] && [ -d "${TMP_DIR}" ]; then
-        rm -rf "${TMP_DIR}"
-    fi
-}
 
 # Brave API key の確認または要求
 ensure_api_key() {
@@ -74,8 +67,11 @@ install_brave_skills() {
     print_info "Brave Search skills を ${SKILLS_DIR} に展開します。"
     mkdir -p "${SKILLS_DIR}"
 
-    curl -sL "${BRAVE_SKILLS_URL}" \
-        | tar -xz -C "${SKILLS_DIR}" --strip-components=2 brave-search-skills-main/skills
+    if ! curl -sL "${BRAVE_SKILLS_URL}" \
+        | tar -xz -C "${SKILLS_DIR}" --strip-components=2 brave-search-skills-main/skills; then
+        print_error "Brave Search skills のダウンロードまたは展開に失敗しました。"
+        exit 1
+    fi
 
     print_ok "Brave Search skills の展開が完了しました。"
 }
@@ -89,7 +85,10 @@ install_bx() {
 
     print_info "bx CLI をインストールします。"
     mkdir -p "${BX_INSTALL_DIR}"
-    curl -fsSL https://raw.githubusercontent.com/brave/brave-search-cli/main/scripts/install.sh | sh
+    if ! curl -fsSL https://raw.githubusercontent.com/brave/brave-search-cli/main/scripts/install.sh | sh; then
+        print_error "bx CLI のダウンロードまたはインストールに失敗しました。"
+        exit 1
+    fi
 
     if ! command -v bx >/dev/null 2>&1; then
         print_error "bx CLI のインストールに失敗しました。"
@@ -109,12 +108,15 @@ configure_bx() {
 test_api_with_curl() {
     print_info "curl で Brave Web Search API をテストします。"
 
-    response=$(curl -s "https://api.search.brave.com/res/v1/web/search" \
+    if ! response=$(curl -s "https://api.search.brave.com/res/v1/web/search" \
         -H "Accept: application/json" \
         -H "X-Subscription-Token: ${BRAVE_API_KEY}" \
         -G \
         --data-urlencode "q=${TEST_QUERY}" \
-        --data-urlencode "count=3")
+        --data-urlencode "count=3"); then
+        print_error "curl コマンドの実行に失敗しました。ネットワーク接続を確認してください。"
+        exit 1
+    fi
 
     if printf '%s' "${response}" | grep -F '"type":"search"' >/dev/null 2>&1; then
         print_ok "curl による Web Search API テストが成功しました。"
@@ -238,8 +240,7 @@ done
 
 # ====== メイン処理 ======
 
-trap cleanup EXIT HUP INT TERM
-TMP_DIR=$(mktemp -d)
+
 
 ensure_api_key
 
