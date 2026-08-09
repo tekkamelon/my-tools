@@ -2,35 +2,123 @@
 
 set -eu
 
-# MPD設定ファイルからmusic_directoryを取得
-get_music_dir(){
+# ====== 関数の宣言 ======
 
-    if [ -e "${HOME}/.config/mpd/mpd.conf" ]; then
+# MPD設定ファイル1件からmusic_directoryの値を抽出
+# インデント・クォート有無・先頭の~に対応,grep失敗時は空文字
+extract_music_dir(){
 
-        grep ^music_directory "${HOME}/.config/mpd/mpd.conf" | cut -d'"' -f2
+    conf_path="${1}"
+    raw_value=""
 
-    elif [ -e "${HOME}/.mpdconf" ]; then
+    # 先頭空白可,コメント行は除外,最初の1件のみ
+    raw_value=$(
+        grep -E '^[[:space:]]*music_directory[[:space:]]+' "${conf_path}" 2>/dev/null | 
+		grep -vE '^[[:space:]]*#' |
+		head -n 1 |
+		sed -E 's/^[[:space:]]*music_directory[[:space:]]+//' |
+		sed -E 's/[[:space:]]*(#.*)?$//' || true
+    )
 
-        grep ^music_directory "${HOME}/.mpdconf" | cut -d'"' -f2
+    # 両端の空白を除去
+    raw_value=$(printf '%s' "${raw_value}" | sed -E 's/^[[:space:]]+//;s/[[:space:]]+$//')
 
-    elif [ -e "/etc/mpd.conf" ]; then
+    # ダブルまたはシングルクォートで囲まれていれば外す
+    case "${raw_value}" in
+        \"*\")
+            raw_value=$(printf '%s' "${raw_value}" | sed -E 's/^"//;s/"$//')
+            ;;
+        \'*\')
+            raw_value=$(printf '%s' "${raw_value}" | sed -E "s/^'//;s/'$//")
+            ;;
+    esac
 
-        grep ^music_directory "/etc/mpd.conf" | cut -d'"' -f2
+    # 先頭の~をHOMEへ展開(リテラルの~を照合)
+    case "${raw_value}" in
+        \~)
+            raw_value="${HOME}"
+            ;;
+        \~/*)
+            raw_value="${HOME}/${raw_value#\~/}"
+            ;;
+    esac
 
-    else
-
-        echo ""
-
-    fi
+    printf '%s\n' "${raw_value}"
 
 }
+
+# 候補パスからmusic_directoryを取得
+get_music_dir(){
+
+    conf_path=""
+    value=""
+
+    for conf_path in \
+        "${HOME}/.config/mpd/mpd.conf" \
+        "${HOME}/.mpdconf" \
+        "/etc/mpd.conf"
+    do
+
+        if [ -e "${conf_path}" ]; then
+
+            value=$(extract_music_dir "${conf_path}")
+
+            if [ -n "${value}" ]; then
+
+                printf '%s\n' "${value}"
+                return 0
+
+            fi
+        fi
+
+    done
+
+    printf '%s\n' ""
+
+}
+
+# 曲ディレクトリ内のカバー画像パスを探索
+# 見つからなければ空文字
+find_cover_path(){
+
+    song_dir="${1}"
+    candidate=""
+
+    for candidate in \
+        "Folder.jpg" \
+        "folder.jpg" \
+        "folder.png" \
+        "cover.jpg" \
+        "cover.png" \
+        "Cover.jpg" \
+        "Cover.png" \
+        "AlbumArt.jpg" \
+        "albumart.jpg"
+    do
+
+        if [ -f "${song_dir}/${candidate}" ]; then
+
+            printf '%s\n' "${song_dir}/${candidate}"
+            return 0
+
+        fi
+
+    done
+
+    printf '%s\n' ""
+
+}
+
+# ====== 関数の宣言ここまで ======
+
+# ====== メイン処理 ======
 
 music_dir=$(get_music_dir)
 
 # music_directoryが見つからない場合のエラー処理
 if [ -z "${music_dir}" ]; then
 
-	# エラーメッセージを通知,4秒で消える
+    # エラーメッセージを通知,4秒で消える
     notify-send -t 4000 "Error: mpd.conf not found or music_directory not set" &
     echo "Error: mpd.conf not found or music_directory not set" >&2
 
@@ -39,7 +127,18 @@ if [ -z "${music_dir}" ]; then
 fi
 
 # 再生中の曲の相対パスを抽出
-current_song=$(mpc current -f "%file%" 2>/dev/null)
+# mpcの終了コードで接続失敗と曲なしを区別
+mpc_status=0
+current_song=$(mpc current -f "%file%" 2>/dev/null) || mpc_status="${?}"
+
+if [ "${mpc_status}" -ne 0 ]; then
+
+    notify-send -t 4000 "Error: Failed to connect to MPD (mpc error)" &
+    echo "Error: Failed to connect to MPD (mpc error)" >&2
+
+    exit 1
+
+fi
 
 # current_songが空の場合のエラー処理
 if [ -z "${current_song}" ]; then
@@ -52,18 +151,26 @@ if [ -z "${current_song}" ]; then
 fi
 
 # ディレクトリのみ抽出
-song_path="${current_song%/*}"
+# ルート直下(スラッシュ無し)はmusic_dirそのものを曲ディレクトリとする
+case "${current_song}" in
+    */*)
+        song_dir="${music_dir}/${current_song%/*}"
+        ;;
+    *)
+        song_dir="${music_dir}"
+        ;;
+esac
 
-# カバーアートまでの絶対パス
-img_dir="${music_dir}/${song_path}/Folder.jpg"
-
-# カバーアートファイルの存在確認
-if [ ! -f "$img_dir" ]; then
-
-    img_dir=""
-
-fi
+# カバーアートの絶対パス(無ければ空)
+cover_path=$(find_cover_path "${song_dir}")
 
 # 再生中の曲の情報を通知(カバーアートがあれば表示)
-notify-send -t 4000 "$(mpc status)" -i "${img_dir}" &
+if [ -n "${cover_path}" ]; then
 
+    notify-send -t 4000 "$(mpc status)" -i "${cover_path}" &
+
+else
+
+    notify-send -t 4000 "$(mpc status)" &
+
+fi
