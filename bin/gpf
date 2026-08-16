@@ -18,10 +18,7 @@ available_tools=$(
 	check_tool opencode
 	check_tool kilocode
 	check_tool goose
-	# grok build はコマンド名が grok
-	if command -v grok > /dev/null 2>&1; then
-		printf '%s\n' 'grok build'
-	fi
+	check_tool grok
 	check_tool pi
 )
 
@@ -99,7 +96,7 @@ case "${ai_tool}" in
 	goose)
 		goose run --no-session -t "${message}"
 		;;
-	"grok build")
+	grok)
 		exec grok --always-approve -p "${message}"
 		;;
 	pi)
