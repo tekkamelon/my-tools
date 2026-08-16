@@ -1,6 +1,5 @@
 #!/bin/sh
 
-set -eu
 
 # 環境変数の設定
 export LANG=C
@@ -19,7 +18,14 @@ available_tools=$(
 	check_tool opencode
 	check_tool kilocode
 	check_tool goose
+	# grok build はコマンド名が grok
+	if command -v grok > /dev/null 2>&1; then
+		printf '%s\n' 'grok build'
+	fi
+	check_tool pi
 )
+
+set -eu
 
 # 利用可能なツールの数をカウント
 tool_count=$(printf '%s' "${available_tools}" | grep -c '^' || true)
@@ -34,6 +40,8 @@ if [ "${tool_count}" -eq 0 ]; then
 		opencode : curl -fsSL https://opencode.ai/install | bash
 		kilocode : npm install -g @kilocode/cli
 		goose : curl -fsSL https://github.com/aaif-goose/goose/releases/download/stable/download_cli.sh | bash
+		grok build : https://grok.x.ai/ から grok CLI をインストール
+		pi : npm install -g @mariozechner/pi-coding-agent
 	EOS
 	exit 1
 fi
@@ -67,7 +75,7 @@ case "${extracted}" in
 		message="現在のgit commitをgit revertで打ち消してください.操作時に許可は不要です"
 		;;
 	3)
-		message="git addされたファイルを確認し日本語で適切なコミットを作成して下さい.操作時に許可は不要です"
+		message="変更を確認し日本語で適切なコミットを作成して下さい.操作時に許可は不要です"
 		;;
 	4)
 		message="gitの履歴を確認し必要であれば日本語で@README.mdに追記してください"
@@ -90,6 +98,12 @@ case "${ai_tool}" in
 		;;
 	goose)
 		goose run --no-session -t "${message}"
+		;;
+	"grok build")
+		exec grok --always-approve -p "${message}"
+		;;
+	pi)
+		exec pi -p "${message}"
 		;;
 	*)
 		exec "${ai_tool}" --yolo -p "${message}"
