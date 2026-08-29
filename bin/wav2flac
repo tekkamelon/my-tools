@@ -55,6 +55,12 @@ die() {
 # ====== 依存コマンドの確認 ======
 command -v ffmpeg >/dev/null 2>&1 || die "ffmpeg がインストールされていません"
 
+# 引数なしの場合は usage を表示して終了
+if [ "$#" -eq 0 ]; then
+    usage
+    exit 1
+fi
+
 # ====== 引数の解析 ======
 while [ "$#" -gt 0 ]; do
     case "$1" in
