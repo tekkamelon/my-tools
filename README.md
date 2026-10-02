@@ -257,3 +257,119 @@
 
 - 電源管理用の設定ファイル
 
+## 3dprint_watcher
+
+- go2rtc経由で3Dプリンタ監視カメラのスナップショットを取得しAIでプリント状態を判断
+
+- オプション
+
+    - -d <working_dir>
+
+        - スナップショットの作業ディレクトリを指定
+
+    - -h <go2rtc_host>
+
+        - go2rtcのホストを指定
+
+## bell-notify
+
+- タスク完了をnotify-sendとベル音で通知
+
+## bookworm2trixie.sh
+
+- Debian bookwormからtrixieへアップグレードするためのスクリプト
+
+- root権限で実行し、sources.listをbookwormからtrixieに置換してアップグレードを行う
+
+## fs
+
+- ~/.ssh/configのHostをfzfで選択してssh接続
+
+## kinai-mode
+
+- wi-fiとbluetoothをOFFにする機内モード用コマンド
+
+## opcli
+
+- OctoPrintのジョブ制御CLIツール
+
+- オプション
+
+    - -h HOST
+
+        - OctoPrintのホストを指定(デフォルトはOCTOPRINT_HOST環境変数又はlocalhost)
+
+    - -p PORT
+
+        - OctoPrintのポートを指定(デフォルトはOCTOPRINT_PORT環境変数又は80)
+
+- サブコマンド
+
+    - status
+
+        - 現在のプリントジョブの状態を取得
+
+    - stop
+
+        - 現在のプリントジョブをキャンセル
+
+    - pause
+
+        - 現在のプリントジョブを一時停止
+
+    - resume
+
+        - 一時停止中のプリントジョブを再開
+
+## setup-brave-search-skills.sh
+
+- Brave Search API公式skillsとbx CLIのセットアップと動作確認用スクリプト
+
+- オプション
+
+    - -k, --api-key KEY
+
+        - Brave Search APIキーを直接指定
+
+    - -t, --test-only
+
+        - セットアップをスキップしテストのみ実行
+
+## tmux-run-all
+
+- 全tmuxセッションの全ペインに同一コマンドを送信
+
+## wav2flac
+
+- ffmpegを用いてWAVファイルをFLACに変換
+
+- オプション
+
+    - -i DIR
+
+        - 入力ディレクトリを指定(デフォルトはカレントディレクトリ)
+
+    - -o DIR
+
+        - 出力ディレクトリを指定(デフォルトは./flac)
+
+    - -l LEVEL
+
+        - FLAC圧縮レベルを0-12で指定(デフォルトは5)
+
+    - -r
+
+        - 入力ディレクトリを再帰的に検索
+
+    - -c IMAGE
+
+        - カバー画像を埋め込む
+
+    - -M KEY=VALUE
+
+        - 全ファイルに共通のメタデータを指定(繰り返し指定可能)
+
+    - -a
+
+        - ファイル名からトラック番号とタイトルを自動設定
+
