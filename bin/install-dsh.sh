@@ -184,19 +184,20 @@ fi
 
 # 日本語化 (Web UI)
 if [ "${skip_ja}" = "0" ]; then
-    print_info "Web UI 日本語化: ${ja_pkg} -> profile ${web_profile}"
+    print_info "Web UI 日本語化: ${ja_name} -> profile ${web_profile}"
 
-    # Web profile の初期化と日本語化プラグインの導入
-    dsh plugin --profile "${web_profile}" -- add "${ja_pkg}"
-
-    # 導入版と実行中の DSH 版の取得
+    # 導入対象の版と実行中の DSH 版の取得 (例外付与には導入前の版解決が必要)
     dsh_ver="$(dsh --version)"
-    ja_pkg_json="${dsh_home}/profiles/${web_profile}/node_modules/${ja_name}/package.json"
-    ja_ver="$(node -p "require('${ja_pkg_json}').version")"
+    ja_ver="$(npm view "${ja_pkg}" version)"
 
-    # peerDependencies の版レンジ不一致による読込スキップの回避 (版を限定した例外)
+    # peerDependencies の版レンジ不一致による導入拒否の回避 (版を限定した例外)
+    # dsh 側は導入前の例外付与を要求するため、導入より先に付与する
     print_info "互換性例外の付与: ${ja_name}@${ja_ver} / dsh ${dsh_ver}"
     dsh plugin --profile "${web_profile}" allow-version "${ja_name}@${ja_ver}" --dsh-version "${dsh_ver}" --accept-risk
+
+    # 日本語化プラグインの導入
+    print_info "日本語化プラグインの導入: ${ja_name}@${ja_ver}"
+    dsh plugin --profile "${web_profile}" -- add "${ja_name}@${ja_ver}"
 
     # 既定ロケールを日本語に固定 (既存の locale エントリを置換追記)
     patch_file="${dsh_home}/profiles/${web_profile}/cordis.patch.yml"
@@ -236,4 +237,5 @@ cat <<NEXT_EOF
   2. TUI 起動: dsh --profile ${profile}
   3. ACP 起動: dsh --profile acp
   4. Web 起動: dsh web (UI は日本語)
+     起動中の Web UI には反映されないため、再起動が必要
 NEXT_EOF
