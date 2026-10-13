@@ -151,10 +151,10 @@ if [ "${node_ok}" != "1" ]; then
     exit 1
 fi
 
-# pnpm 存在確認 (dsh plugin 内部使用)
+# pnpm 存在確認と自動導入 (dsh plugin 内部使用)
 if ! command -v pnpm >/dev/null 2>&1; then
-    print_error "pnpm の不在 (dsh plugin が内部使用)"
-    exit 1
+    print_info "pnpm の自動導入"
+    npm install -g pnpm
 fi
 
 
