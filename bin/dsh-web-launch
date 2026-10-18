@@ -1,0 +1,39 @@
+#!/bin/sh
+# DeepSeek Harness (dsh) の Web UI 起動ラッパー
+# 既存の dsh web を検出した場合はブラウザのみを開く
+set -eu
+
+# ====== 変数の宣言 ======
+dsh_bin=$(command -v dsh 2>/dev/null || true)
+
+if [ -z "${dsh_bin}" ]; then
+    dsh_bin="${HOME}/.npm-global/bin/dsh"
+fi
+
+web_host="127.0.0.1"
+web_port="${DSH_WEB_PORT:-3080}"
+web_url="http://${web_host}:${web_port}/"
+probe_timeout="2"
+auth_marker="dsh web authentication required"
+log_dir="${XDG_STATE_HOME:-${HOME}/.local/state}/dsh"
+log_file="${log_dir}/web-launch.log"
+# ====== 変数の宣言ここまで ======
+
+# ====== 既存サーバの検出 ======
+if command -v curl >/dev/null 2>&1; then
+    response=$(curl -s -m "${probe_timeout}" "${web_url}" 2>/dev/null || true)
+
+    if printf '%s' "${response}" | grep -Fq "${auth_marker}"; then
+        # 既存サーバの検出時はブラウザのみを開く
+        exec xdg-open "${web_url}"
+    fi
+fi
+# ====== 既存サーバの検出ここまで ======
+
+# ====== dsh web の起動 ======
+mkdir -p "${log_dir}"
+
+printf '%s dsh web 起動\n' "$(date '+%Y-%m-%dT%H:%M:%S%z')" >> "${log_file}"
+
+exec "${dsh_bin}" web --host "${web_host}" --port "${web_port}" >> "${log_file}" 2>&1
+# ====== dsh web の起動ここまで ======
